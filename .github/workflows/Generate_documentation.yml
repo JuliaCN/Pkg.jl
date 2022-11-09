@@ -1,0 +1,36 @@
+name: Generate documentation
+on:
+  pull_request:
+    branches:
+      - 'master'
+      - 'release-*'
+  push:
+    branches:
+      - 'master'
+      - 'release-*'
+    tags: '*'
+defaults:
+  run:
+    shell: bash
+concurrency:
+  # Skip intermediate builds: all builds except for builds on the `master` or `release-*` branches
+  # Cancel intermediate builds: only pull request builds
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-') || github.run_number }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v1.0.0
+      - uses: julia-actions/setup-julia@latest
+        with:
+          # version: '1.6'
+          version: 'nightly'
+      - name: Generate docs
+        run: |
+          julia --color=yes .ci/test_and_change_uuid.jl
+          julia --project --color=yes -e 'using Pkg; Pkg.activate("docs"); Pkg.instantiate(); Pkg.develop(PackageSpec(path = pwd()))'
+          julia --project=docs --color=yes docs/make.jl pdf
+        env:
+          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
