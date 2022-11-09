@@ -1,17 +1,15 @@
+
 ```@meta
-EditURL = "https://github.com/JuliaLang/Pkg.jl/blob/master/docs/src/basedocs.md"
+EditURL = "https://github.com/ioxera/Pkg.jl/blob/master/docs/src/basedocs.md"
 ```
 
 # Pkg
 
-Pkg is Julia's builtin package manager, and handles operations
-such as installing, updating and removing packages.
+Pkg 是Julia内建的包管理器，用于处理安装，更新，移除包等操作。
 
 !!! note
-    What follows is a very brief introduction to Pkg. For more
-    information on `Project.toml` files, `Manifest.toml` files, package
-    version compatibility (`[compat]`), environments, registries, etc.,
-    it is highly recommended to read the full manual, which is available here:
+    下面是Pkg的简短介绍。更详细的信息位于 `Project.toml` 和 `Manifest.toml` 文件，
+    包括包版本兼容性(`[compat]`)，环境，注册表等信息。高度建议阅读完整手册，可以访问：
     [https://pkgdocs.julialang.org](https://pkgdocs.julialang.org).
 
 ```@eval

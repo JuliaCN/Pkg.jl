@@ -1,15 +1,11 @@
+
 # [**8.** Artifacts](@id Artifacts)
 
-`Pkg` can install and manage containers of data that are not Julia packages.  These containers can contain platform-specific binaries, datasets, text, or any other kind of data that would be convenient to place within an immutable, life-cycled datastore.
-These containers, (called "Artifacts") can be created locally, hosted anywhere, and automatically downloaded and unpacked upon installation of your Julia package.
-This mechanism is also used to provide the binary dependencies for packages built with [`BinaryBuilder.jl`](https://github.com/JuliaPackaging/BinaryBuilder.jl).
+`Pkg` 可以安装和管理数据容器，它不是 Julia 包。这些容器可以包含特定于平台的二进制文件、数据集、文本或任何其他类型的数据，这些数据可以方便地放置在不可变的、具有生命周期的数据存储中。这些容器（称为“Artifacts”）可以在本地创建、托管在任何地方，并在安装 Julia 包时自动下载和解包。此机制还为使用[`BinaryBuilder.jl`](https://github.com/JuliaPackaging/BinaryBuilder.jl) 进行包构建提供二进制依赖。
 
-## Basic Usage
+## 基本用法
 
-`Pkg` artifacts are declared in an `Artifacts.toml` file, which can be placed in your current directory or in the root of your package.
-Currently, `Pkg` supports downloading of tarfiles (which can be compressed) from a URL.
-Following is a minimal `Artifacts.toml` file which will permit the downloading of a `socrates.tar.gz` file from `github.com`.
-In this example, a single artifact, given the name `socrates`, is defined.
+`Pkg` artifacts 在Artifacts.toml文件中声明，该文件可以放在当前目录或包的根目录中。目前，`Pkg` 支持从 URL 下载 tar 文件（可以压缩）。以下是一个最小 `Artifacts.toml` 文件，它允许从 `github.com` 下载 `socrates.tar.gz` 文件。在此示例中，定义了一个名为 `socrates` 的 artifact。
 
 ```TOML
 # a simple Artifacts.toml file
@@ -21,8 +17,7 @@ git-tree-sha1 = "43563e7631a7eafae1f9f8d9d332e3de44ad7239"
     sha256 = "e65d2f13f2085f2c279830e863292312a72930fee5ba3c792b14c33ce5c5cc58"
 ```
 
-If this `Artifacts.toml` file is placed in your current directory, then `socrates.tar.gz` can be downloaded, unpacked and used with `artifact"socrates"`.
-Since this tarball contains a folder `bin`, and a text file named `socrates` within that folder, we could access the content of that file as follows.
+如果 `Artifacts.toml` 文件位于您的当前目录中，则 `socrates.tar.gz` 可以下载、解压缩，并以 `artifact"socrates"` 方式使用。由于这个 tar 压缩包包含一个 `bin` 文件夹和一个名为 `socrates` 的文本文件，我们可以按如下方式访问该文件的内容。
 
 ```julia
 using Pkg.Artifacts
@@ -33,9 +28,7 @@ open(joinpath(rootpath, "bin", "socrates")) do file
 end
 ```
 
-If you have an existing tarball that is accessible via a `url`, it could also be accessed in this manner.
-To create the `Artifacts.toml` you must compute two hashes: the `sha256` hash of the download file, and the `git-tree-sha1` of the unpacked content.
-These can be computed as follows.
+如果您有一个可通过 `url` 访问的现有 tar 压缩包，也可以以这种方式访问​​它。要创建 `Artifacts.toml` 您必须计算两个哈希值：下载文件的 `sha256` 哈希值和解压内容的 `git-tree-sha1` 哈希值。这些可以计算如下：
 
 ```julia
 using Tar, Inflate, SHA
@@ -45,19 +38,19 @@ println("sha256: ", bytes2hex(open(sha256, filename)))
 println("git-tree-sha1: ", Tar.tree_hash(IOBuffer(inflate_gzip(filename))))
 ```
 
-To access this artifact from within a package you create, place the `Artifacts.toml` at the root of your package, adjacent to `Project.toml`. Then, make sure to add `Pkg` in your `deps` and set `julia = "1.3"` or higher in your `compat` section.
+要从您创建的包中访问此 artifact，请将 `Artifacts.toml` 放在包的根目录中，和 `Project.toml` 相邻。然后，确保在您的 `deps` 节中添加了 `Pkg`，以及在 `compat` 节中设置 `julia = "1.3"` 或更高版本。
 
-## `Artifacts.toml` files
+## `Artifacts.toml` 文件
 
-`Pkg` provides an API for working with artifacts, as well as a TOML file format for recording artifact usage in your packages, and to automate downloading of artifacts at package install time.
-Artifacts can always be referred to by content hash, but are typically accessed by a name that is bound to a content hash in an `Artifacts.toml` file that lives in a project's source tree.
+`Pkg` 提供了用于使用 artifacts 的 API，以及用于记录软件包中 artifacts 使用情况的 TOML 文件格式，并在软件包安装时自动下载 artifacts。Artifacts 始终可以通过内容哈希来引用，但通常通过绑定到项目源树中 `Artifacts.toml` 文件的内容哈希的名称来访问。
 
 !!! note
+    可以使用替代名称 `JuliaArtifacts.toml`，类似于分别使用 `JuliaProject.toml` 和 `JuliaManifest.toml` 代替 `Project.toml` 和 `Manifest.toml`。
     It is possible to use the alternate name `JuliaArtifacts.toml`, similar
     to how it is possible to use `JuliaProject.toml` and `JuliaManifest.toml`
     instead of `Project.toml` and `Manifest.toml`, respectively.
 
-An example `Artifacts.toml` file is shown here:
+此处显示了一个 `Artifacts.toml` 文件示例：
 
 ```TOML
 # Example Artifacts.toml file
@@ -96,36 +89,25 @@ os = "macos"
 git-tree-sha1 = "1c223e66f1a8e0fae1f9fcb9d3f2e3ce48a82200"
 ```
 
-This `Artifacts.toml` binds three artifacts; one named `socrates`, one named `c_simple` and one named `processed_output`.
-The single required piece of information for an artifact is its `git-tree-sha1`.
-Because artifacts are addressed only by their content hash, the purpose of an `Artifacts.toml` file is to provide metadata about these artifacts, such as binding a human-readable name to a content hash, providing information about where an artifact may be downloaded from, or even binding a single name to multiple hashes, keyed by platform-specific constraints such as operating system or libgfortran version.
+此 `Artifacts.toml` 绑定了三个 artifacts：一个命名为 `socrates`，一个命名为 `c_simple`，一个命名为 `processed_output`。artifacts 唯一需要的信息是它的 `git-tree-sha1`。因为 artifacts 仅通过其内容哈希寻址，所以 `Artifacts.toml` 文件的目的是提供有关这些 artifacts 的元数据，例如绑定人类可读的名称到内容哈希，提供有关可以从何处下载 artifacts 的信息，甚至绑定单个名称到多个哈希，由特定于平台的约束（例如操作系统或 `libgfortran` 的版本）键控(keyed)。
 
-## Artifact types and properties
+## Artifact 类型和属性
 
-In the above example, the `socrates` artifact showcases a platform-independent artifact with multiple download locations.
-When downloading and installing the `socrates` artifact, URLs will be attempted in order until one succeeds.
-The `socrates` artifact is marked as `lazy`, which means that it will not be automatically downloaded when the containing package is installed, but rather will be downloaded on-demand when the package first attempts to use it.
+在上面的示例中，`socrates` artifact 展示了具有多个下载位置的独立于平台的 artifact。下载和安装 `socrates` artifact 时，将按顺序尝试 URL 直到成功。该`socrates` artifact 被标记为 `lazy`，这意味着它不会在安装包含的包时自动下载，而是在包第一次尝试使用它时按需下载。
 
-The `c_simple` artifact showcases a platform-dependent artifact, where each entry in the `c_simple` array contains keys that help the calling package choose the appropriate download based on the particulars of the host machine.
-Note that each artifact contains both a `git-tree-sha1` and a `sha256` for each download entry.  This is to ensure that the downloaded tarball is secure before attempting to unpack it, as well as enforcing that all tarballs must expand to the same overall tree hash.
+`c_simple` artifact 展示了一个依赖于平台的 artifact，其中 `c_simple` 数组中的每个条目都包含键，键帮助调用包根据主机的详细信息选择适当的下载地址。请注意，每个 artifact 都包含对应下载条目的 `git-tree-sha1` 和 `sha256`。这是为了确保下载的 tar 压缩包在尝试解压缩之前是安全的，并强制所有 tar 压缩包必须扩展为同样的整体 git 树哈希。
 
-The `processed_output` artifact contains no `download` stanza, and so cannot be installed.
-An artifact such as this would be the result of code that was previously run, generating a new artifact and binding the resultant hash to a name within this project.
+`processed_output` artifact不包含 `download` 节，因此无法被安装。像这样的 artifact 是先前运行的代码的结果，生成一个新的 artifact 并将生成的哈希绑定到该项目中的名称上。
 
-## Using Artifacts
+## 使用 Artifacts
 
-Artifacts can be manipulated using convenient APIs exposed from the `Pkg.Artifacts` namespace.
-As a motivating example, let us imagine that we are writing a package that needs to load the [Iris machine learning dataset](https://archive.ics.uci.edu/ml/datasets/iris).
-While we could just download the dataset during a build step into the package directory, and many packages currently do precisely this, that has some significant drawbacks:
+可以使用从 `Pkg.Artifacts` 命名空间公开的便捷 API 来操作 artifact 。作为一个激励性的例子，让我们想象我们正在编写一个需要加载 [Iris 机器学习数据集](https://archive.ics.uci.edu/ml/datasets/iris)的包。虽然我们可以在构建步骤中将数据集下载到包目录中，并且目前许多包都这样做，但这有一些明显的缺点：
 
-* First, it modifies the package directory, making package installation stateful, which we want to avoid.
-  In the future, we would like to reach the point where packages can be installed completely read-only, instead of being able to modify themselves after installation.
+* 首先，它修改了包目录，使包安装变得具有状态了，这是我们要避免的。将来，我们希望能够以完全只读的方式安装包，而不是在安装后能够自行修改。
 
-* Second, the downloaded data is not shared across different versions of our package.
-  If we have three different versions of the package installed for use by various projects, then we need three different copies of the data, even if it hasn't changed between those versions.
-  Moreover, each time we upgrade or downgrade the package unless we do something clever (and probably brittle), we have to download the data again.
+* 其次，下载的数据不会在包的不同版本之间共享。如果我们安装了三个不同版本的包以供不同项目使用，那么我们需要三个不同的数据副本，即使这些版本之间没有更改。此外，每次我们升级或降级软件包时，除非我们做了一些聪明的事情（而且可能很脆弱），否则我们必须再次下载数据。
 
-With artifacts, we will instead check to see if our `iris` artifact already exists on-disk and only if it doesn't will we download and install it, after which we can bind the result into our `Artifacts.toml` file:
+对于 artifacts，我们将检查 `iris` artifacts 是否已经存在于磁盘上，只有不存在时我们才会下载并安装它，之后我们可以将结果绑定到我们的 `Artifacts.toml` 文件中：
 
 ```julia
 using Pkg.Artifacts
@@ -159,8 +141,7 @@ end
 iris_dataset_path = artifact_path(iris_hash)
 ```
 
-For the specific use case of using artifacts that were previously bound, we have the shorthand notation `artifact"name"` which will automatically search for the `Artifacts.toml` file contained within the current package, look up the given artifact by name, install it if it is not yet installed, then return the path to that given artifact.
-An example of this shorthand notation is given below:
+对于使用先前绑定的 artifacts 的特定用例，我们有一个速记符号 `artifact"name"`，它将自动搜索当前包中的 `Artifacts.toml` 文件，按名称查找给定的 artifacts，如果尚未安装，则安装它，然后返回该给定 artifacts 的路径。下面给出了这个速记符号的一个例子：
 
 ```julia
 using Pkg.Artifacts
@@ -171,26 +152,22 @@ using Pkg.Artifacts
 iris_dataset_path = artifact"iris"
 ```
 
-## The `Pkg.Artifacts` API
+## `Pkg.Artifacts` API
 
+`Artifacts` API 分为三个级别：哈希感知函数、名称感知函数和实用函数。
 The `Artifacts` API is broken up into three levels: hash-aware functions, name-aware functions and utility functions.
 
-* **Hash-aware** functions deal with content-hashes and essentially nothing else. These methods allow you to query whether an artifact exists, what its path is, verify that an artifact satisfies its content hash on-disk, etc.  Hash-aware functions include: `artifact_exists()`, `artifact_path()`, `remove_artifact()`, `verify_artifact()` and `archive_artifact()`.  Note that in general you should not use `remove_artifact()` and should instead use `Pkg.gc()` to cleanup artifact installations.
+* **哈希感知**函数只处理内容哈希。这些方法允许您查询 artifact 是否存在、其路径是什么、验证 artifact 是否满足其在磁盘上的内容哈希等。哈希感知函数包括：`artifact_exists()`、`artifact_path()`、`remove_artifact()`、`verify_artifact()`和 `archive_artifact()`。请注意，通常您不应该使用 `remove_artifact()`，而应该使用 `Pkg.gc()` 来清理安装的 artifact。
 
-* **Name-aware** functions deal with bound names within an `Artifacts.toml` file, and as such, typically require both a path to an `Artifacts.toml` file as well as the artifact name.  Name-aware functions include: `artifact_meta()`, `artifact_hash()`, `bind_artifact!()`, `unbind_artifact!()`, `download_artifact()` and `ensure_artifact_installed()`.
+* **名称感知**函数处理 `Artifacts.toml` 文件中的绑定名称，因此，通常需要 `Artifacts.toml` 文件路径和 artifact 名称。名称感知函数包括：`artifact_meta()`、`artifact_hash()`、`bind_artifact!()`、`unbind_artifact!()`、`download_artifact()` 和 `ensure_artifact_installed()`。
 
-* **Utility** functions deal with miscellaneous aspects of artifact life, such as `create_artifact()`, `ensure_all_artifacts_installed()`, and even the `@artifact_str` string macro.
+* **实用**函数处理 artifact 生命周期的各种方面，例如 `create_artifact()`、`ensure_all_artifacts_installed()`，甚至是 `@artifact_str` 字符串宏。
 
-For a full listing of docstrings and methods, see the [Artifacts Reference](@ref) section.
+有关文档字符串和方法的完整列表，请参阅 [Artifacts Reference](@ref)章节。
 
-## Overriding artifact locations
+## 覆盖 artifact 位置
 
-It is occasionally necessary to be able to override the location and content of an artifact.
-A common use case is a computing environment where certain versions of a binary dependency must be used, regardless of what version of this dependency a package was published with.
-While a typical Julia configuration would download, unpack and link against a generic library, a system administrator may wish to disable this and instead use a library already installed on the local machine.
-To enable this, `Pkg` supports a per-depot `Overrides.toml` file placed within the `artifacts` depot directory (e.g. `~/.julia/artifacts/Overrides.toml` for the default user depot) that can override the location of an artifact either by content-hash or by package UUID and bound artifact name.
-Additionally, the destination location can be either an absolute path, or a replacement artifact content hash.
-This allows sysadmins to create their own artifacts which they can then use by overriding other packages to use the new artifact.
+有时需要能够覆盖 artifact 的位置和内容。一个常见的例子是计算环境，其中必须使用某些版本的二进制依赖项，而不管包是使用哪个版本的依赖项发布的。虽然典型的 Julia 配置会下载、解包并链接到通用库，但系统管理员可能希望禁用此功能，而使用已安装在本地计算机上的库。`Pkg` 通过在 `artifacts` depot 目录中放置一个 `Overrides.toml` 文件启用对此功能的支持（例如对于默认用户仓库是 `~/.julia/artifacts/Overrides.toml` 文件），它可以通过内容哈希，或包的 `UUID` 和绑定到 artifact 的名称覆盖 artifact 的位置。此外，目标位置可以是绝对路径，也可以是 artifact 内容哈希。这允许系统管理员创建他们自己的 artifacts，然后他们可以通过覆盖其他包来使用新 artifact。
 
 ```TOML
 # Override single hash to an absolute path
@@ -206,9 +183,7 @@ libfoo = "/path/to/libfoo"
 libbar = "683942669b4639019be7631caa28c38f3e1924fe"
 ```
 
-Due to the layered nature of `Pkg` depots, multiple `Overrides.toml` files may be in effect at once.
-This allows the "inner" `Overrides.toml` files to override the overrides placed within the "outer" `Overrides.toml` files.
-To remove an override and re-enable default location logic for an artifact, insert an entry mapping to the empty string:
+由于`Pkg` depot 的分层特性，多个 `Overrides.toml` 文件可能同时生效。这允许“内部” `Overrides.toml` 文件覆盖放在“外部” `Overrides.toml` 文件中的覆盖规则。要删除覆盖并重新启用 artifact 的默认位置逻辑，请将条目映射插入到空字符串中：
 
 ```TOML
 78f35e74ff113f02274ce60dab6e92b4546ef806 = "/path/to/new/replacement"
@@ -218,25 +193,16 @@ To remove an override and re-enable default location logic for an artifact, inse
 libfoo = ""
 ```
 
-If the two `Overrides.toml` snippets as given above are layered on top of each other, the end result will be mapping the content-hash `78f35e74ff113f02274ce60dab6e92b4546ef806` to `"/path/to/new/replacement"`, and mapping `Foo.libbar` to the artifact identified by the content-hash `683942669b4639019be7631caa28c38f3e1924fe`.
-Note that while that hash was previously overridden, it is no longer, and therefore `Foo.libbar` will look directly at locations such as `~/.julia/artifacts/683942669b4639019be7631caa28c38f3e1924fe`.
+如果上面给出的两个 `Overrides.toml` 片段相互叠加，最终结果将映射内容哈希 `78f35e74ff113f02274ce60dab6e92b4546ef806` 到 `"/path/to/new/replacement"`，并映射 `Foo.libbar` 到由内容哈希标识的 artifact `683942669b4639019be7631caa28c38f3e1924fe`。请注意，虽然该哈希之前已被覆盖，但它不再被覆盖，因此 `Foo.libbar` 将直接查看 `~/.julia/artifacts/683942669b4639019be7631caa28c38f3e1924fe` 位置。
 
-Most methods that are affected by overrides can ignore overrides by setting `honor_overrides=false` as a keyword argument within them.
-For UUID/name-based overrides to work, `Artifacts.toml` files must be loaded with the knowledge of the UUID of the loading package.
-This is deduced automatically by the `artifacts""` string macro, however, if you are for some reason manually using the `Pkg.Artifacts` API within your package and you wish to honor overrides, you must provide the package UUID to API calls like `artifact_meta()` and `ensure_artifact_installed()` via the `pkg_uuid` keyword argument.
+大多数受覆盖影响的方法可以通过设置它们的 `honor_overrides=false` 关键字参数来忽略覆盖。要使基于 UUID/名称 的覆盖起作用，`Artifacts.toml` 文件必须在知道加载包的 UUID 的情况下被加载。这是由 `artifacts""` 字符串宏自动推导出来的，但是，如果您出于某种原因在包中手动使用 `Pkg.Artifacts` API 并且希望尊重覆盖，则必须通过关键字参数将包的 UUID 提供给 API 调用，类似于 `artifact_meta()` 和 `ensure_artifact_installed()` 使用 `pkg_uuid` 关键字参数。
 
-## Extending Platform Selection
+## 扩展平台选择
 
 !!! compat "Julia 1.7"
-    Pkg's extended platform selection requires at least Julia 1.7, and is considered experimental.
+    Pkg 的扩展平台选择至少需要 Julia 1.7，并且被认为是实验性的。
 
-New in Julia 1.6, `Platform` objects can have extended attributes applied to them, allowing artifacts to be tagged with things such as CUDA driver version compatibility, microarchitectural compatibility, julia version compatibility and more!
-Note that this feature is considered experimental and may change in the future.
-If you as a package developer find yourself needing this feature, please get in contact with us so it can evolve for the benefit of the whole ecosystem.
-In order to support artifact selection at `Pkg.add()` time, `Pkg` will run the specially-named file `<project_root>/.pkg/select_artifacts.jl`, passing the current platform triplet as the first argument.
-This artifact selection script should print a `TOML`-serialized dictionary representing the artifacts that this package needs according to the given platform, and perform any inspection of the system as necessary to auto-detect platform capabilities if they are not explicitly provided by the given platform triplet.
-The format of the dictionary should match that returned from `Artifacts.select_downloadable_artifacts()`, and indeed most packages should simply call that function with an augmented `Platform` object.
-An example artifact selection hook definition might look like the following, split across two files:
+Julia 1.6 中的新增功能，`Platform` 对象可以应用扩展属性，允许使用诸如 CUDA 驱动程序版本兼容性、微架构兼容性、julia 版本兼容性等扩展属性标记 artifacts！请注意，此功能被认为是实验性的，将来可能会更改。如果您作为包开发人员发现自己需要此功能，请与我们联系，以便它可以为整个生态系统的利益而发展。为了在 `Pkg.add()` 时支持 artifact 选择，`Pkg` 将运行特殊命名的文件 `<project_root>/.pkg/select_artifacts.jl`，传递当前平台三元组作为第一个参数。这个 artifact 选择脚本应该打印一个 `TOML` - 表示此包根据给定平台需要的 artifacts 的序列化字典，如果给定平台三元组未明确提供平台功能，则根据需要对系统进行任何检查，以自动检测平台功能。字典的格式应该与从 `Artifacts.select_downloadable_artifacts()` 返回的匹配，实际上大多数包应该简单地用一个增强的 `Platform` 对象调用此函数。artifact 选择 hook 的定义的示例，可能如下所示，分为两个文件：
 
 ```julia
 # .pkg/platform_augmentation.jl
@@ -284,9 +250,7 @@ artifacts = select_downloadable_artifacts(artifacts_toml; platform)
 TOML.print(stdout, artifacts)
 ```
 
-In this hook definition, our platform augmentation routine opens a system library (`libcuda`), searches it for a symbol to give us the CUDA driver version, then embeds the major version of that version number into the `cuda` property of the `Platform` object we are augmenting.
-While it is not critical for this code to actually attempt to close the loaded library (as it will most likely be opened again by the CUDA package immediately after the package operations are completed) it is best practice to make hooks as lightweight and transparent as possible, as they may be used by other Pkg utilities in the future.
-In your own package, you should also use augmented platform objects when using the `@artifact_str` macro, as follows:
+在此 hook 定义中，我们的 platform_augmentation 例程打开一个系统库(`libcuda`)，搜索 CUDA 驱动的版本符号，然后将版本号中的主版本号嵌入到我们要增强的 `Platform` 对象的 `cuda` 属性中。虽然实际尝试关闭已加载的库对于此代码而言并不重要（因为它很可能会在包操作完成后，立即被 CUDA 包再次打开），但最佳实践是使 hook 尽可能轻量级和透明，因为它们将来可能会被其他 Pkg 实用程序使用。在您自己的包中，您也应该在使用 `@artifact_str` 宏时使用增强的平台对象，如下所示：
 
 ```julia
 include("../.pkg/platform_augmentation.jl")
@@ -297,6 +261,7 @@ function __init__()
 end
 ```
 
-This ensures that the same artifact is used by your code as Pkg attempted to install.
+这可确保您的代码使用与 Pkg 尝试安装的 artifact 相同的 artifact。
 
-Artifact selection hooks are only allowed to use `Base`, `Artifacts`, `Libdl`, and `TOML`. They are not allowed to use any other standard libraries, and they are not allowed to use any packages (including the package to which they belong).
+Artifact 选择 hook 仅允许使用`Base`、`Artifacts`、`Libdl` 和 `TOML` 包。不允许使用任何其他标准库，也不允许使用任何包（包括他们所属的包）。
+

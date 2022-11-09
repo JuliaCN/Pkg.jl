@@ -1,13 +1,14 @@
-# [**3.** Managing Packages](@id Managing-Packages)
 
-## Adding packages
+# [**3.** 管理包](@id Managing-Packages)
 
-There are two ways of adding packages, either using the `add` command or the `dev` command.
-The most frequently used is `add` and its usage is described first.
+## 添加包
 
-### Adding registered packages
+有两种添加包的方法，使用 `add` 或 `dev` 命令。最常用的是 `add`，首先描述它的用法。
 
-In the Pkg REPL, packages can be added with the `add` command followed by the name of the package, for example:
+### 添加已注册包
+
+
+在Pkg REPL中，可以使用 `add` 命令后跟包名来添加包，例如：
 
 ```julia-repl
 (@v1.8) pkg> add JSON
@@ -28,16 +29,11 @@ Precompiling environment...
   2 dependencies successfully precompiled in 2 seconds
 ```
 
-Here we added the package Example to the current environment (which is the default `@v1.8` environment).
-In this example, we are using a fresh Julia installation,
-and this is our first time adding a package using Pkg. By default, Pkg installs the General registry
-and uses this registry to look up packages requested for inclusion in the current environment.
-The status update shows a short form of the package UUID to the left, then the package name, and the version.
-Finally, the newly installed packages are "precompiled".
+这里我们将包 Example 添加到当前环境（这是默认 `@v1.8` 环境）。在此示例中，我们使用全新的 Julia 安装，这是我们第一次使用 Pkg 添加包。默认情况下，Pkg 安装 [General](https://github.com/JuliaRegistries/General) 注册表并使用此注册表查找请求包含在当前环境中的包。状态更新在左侧显示包 UUID 的简短形式，然后是包名称和版本。最后，新安装的包被“预编译”。
 
-It is possible to add multiple packages in one command as `pkg> add A B C`.
+可以以 `pkg> add A B C` 形式在一个命令中添加多个包。
 
-The status output contains the packages you have added yourself, in this case, `JSON`:
+`status` 输出您自己添加的包，在本例中为 `JSON`：
 
 ```julia-repl
 (@v1.8) pkg> st
@@ -45,7 +41,7 @@ The status output contains the packages you have added yourself, in this case, `
   [682c06a0] JSON v0.21.3
 ```
 
-The manifest status shows all the packages in the environment, including recursive dependencies:
+`status -m` 显示环境中的所有包，包括递归依赖项：
 
 ```julia-repl
 (@v1.8) pkg> st -m
@@ -58,9 +54,9 @@ Status `~/environments/v1.9/Manifest.toml`
   [4ec0a83e] Unicode
 ```
 
-Since standard libraries (e.g. ` Dates`) are shipped with Julia, they do not have a version.
+由于标准库（例如 `Dates`）随 Julia 一起提供，因此它们没有版本。
 
-After a package is added to the project, it can be loaded in Julia:
+将包添加到项目后，可以在 Julia 中加载它：
 
 ```julia-repl
 julia> using JSON
@@ -70,9 +66,9 @@ julia> JSON.json(Dict("foo" => [1, "bar"])) |> print
 ```
 
 !!! note
-    Only packages that have been added with `add` can be loaded (which are packages that are shown when using `st` in the Pkg REPL). Packages that are pulled in only as dependencies (for example the `Parsers` package above) can not be loaded.
+    只能加载已被 `add` 添加的包（即在 Pkg REPL 中使用 `st` 时显示的包）。仅作为依赖项引入的包（例如上面的 `Parsers` 包）无法加载。
 
-A specific version of a package can be installed by appending a version after a `@` symbol to the package name:
+可以通过在包名称后面附加一个 `@` 及版本号来安装包的特定版本：
 
 ```julia-repl
 (@v1.8) pkg> add JSON@0.21.1
@@ -89,12 +85,11 @@ A specific version of a package can be installed by appending a version after a 
         Info Packages marked with ⌃ and ⌅ have new versions available, but those with ⌅ are restricted by compatibility constraints from upgrading. To see why use `status --outdated -m`
 ```
 
-As seen above, Pkg gives some information when a package is not installed at its latest version.
+如上所示，当软件包安装的不是其最新版本时，Pkg 会提供一些信息。
 
-If not all three numbers are given for the version, for example, `0.21`, then the latest registered version of `0.21.x` would be installed.
+如果没有为版本提供所有三个数字，例如0.21，则将安装最后注册的版本0.21.x。
 
-If a branch (or a certain commit) of `Example` has a hotfix that is not yet included in a registered version,
-we can explicitly track that branch (or commit) by appending `#branchname` (or `#commitSHA1`) to the package name:
+如果 `Example` 的某个分支（或某个提交）有一个尚未包含在注册版本中的补丁程序，我们可以通过将 `#branchname`（或 `#commitSHA1`）附加到包名称后来显式跟踪该分支（或提交）：
 
 ```julia-repl
 (@v1.8) pkg> add Example#master
@@ -106,16 +101,12 @@ we can explicitly track that branch (or commit) by appending `#branchname` (or `
   [7876af07] + Example v0.5.4 `https://github.com/JuliaLang/Example.jl.git#master`
 ```
 
-The status output now shows that we are tracking the `master` branch of `Example`.
-When updating packages, updates are pulled from that branch.
+现在状态输出显示我们正在跟踪 `Example` 的 `master` 分支. 更新包时，会从该分支中​​提取更新。
 
 !!! note
-    If we would specify a commit id instead of a branch name, e.g.
-    `add Example#025cf7e`, then we would effectively "pin" the package
-    to that commit. This is because the commit id always points to the same
-    thing unlike a branch, which may be updated.
+    如果我们指定一个提交 id 而不是分支名称，例如 `add Example#025cf7e`，那么我们将有效地将包“pin”到该提交。这是因为提交 id 总是指向同一个东西，而不像一个分支，它可能会被更新。
 
-To go back to tracking the registry version of `Example`, the command `free` is used:
+要回到跟踪 `Example` 的注册版本，请使用命令 `free`：
 
 ```julia-repl
 (@v1.8) pkg> free Example
@@ -127,9 +118,9 @@ To go back to tracking the registry version of `Example`, the command `free` is 
   [7876af07] ~ Example v0.5.4 `https://github.com/JuliaLang/Example.jl.git#master` ⇒ v0.5.3
 ```
 
-### Adding unregistered packages
+### 添加未注册包
 
-If a package is not in a registry, it can be added by specifying a URL to the Git repository:
+如果一个包不在注册表上，它可以通过指定 Git 仓库的 URL 来添加：
 
 ```julia-repl
 (@v1.8) pkg> add https://github.com/fredrikekre/ImportMacros.jl
@@ -141,10 +132,10 @@ If a package is not in a registry, it can be added by specifying a URL to the Gi
   [92a963f6] + ImportMacros v1.0.0 `https://github.com/fredrikekre/ImportMacros.jl#master`
 ```
 
-The dependencies of the unregistered package (here `MacroTools`) got installed.
-For unregistered packages, we could have given a branch name (or commit SHA1) to track using `#`, just like for registered packages.
+未注册包的依赖(这里是 `MacroTools`)也会被安装。对于未注册的包，我们可以使用 `#` 给出一个分支名称（或提交的 SHA1）来跟踪 ，就像已注册包一样。
 
-If you want to add a package using the SSH-based `git` protocol, you have to use quotes because the URL contains a `@`. For example,
+如果要使用基于 SSH 的 `git` 协议添加包，则必须使用引号，因为 URL 包含 `@`. 例如：
+
 ```julia-repl
 (@v1.8) pkg> add "git@github.com:fredrikekre/ImportMacros.jl.git"
     Cloning git-repo `git@github.com:fredrikekre/ImportMacros.jl.git`
@@ -156,12 +147,9 @@ Updating `~/.julia/environments/v1/Manifest.toml`
   [92a963f6] + ImportMacros v1.0.0 `git@github.com:fredrikekre/ImportMacros.jl.git#master`
 ```
 
+#### 从仓库的子目录中添加包
 
-#### Adding a package in a subdirectory of a repository
-
-If the package you want to add by URL is not in the root of the repository, then you need pass that subdirectory using `:`.
-For instance, to add the `SnoopCompileCore` package in the [SnoopCompile](https://github.com/timholy/SnoopCompile.jl)
-repository:
+如果要通过 URL 添加的包不在存储库的根目录中，则需要使用 `:`。例如，要添加[SnoopCompile](https://github.com/timholy/SnoopCompile.jl)仓库中的 `SnoopCompileCore` 包 ：
 
 ```julia-repl
 pkg> add https://github.com/timholy/SnoopCompile.jl.git:SnoopCompileCore
@@ -174,28 +162,18 @@ pkg> add https://github.com/timholy/SnoopCompile.jl.git:SnoopCompileCore
   [9e88b42a] + Serialization
 ```
 
-### Adding a local package
+### 添加本地包
 
-Instead of giving a URL of a git repo to `add` we could instead have given a local path **to a git repo**.
-This works similar to adding a URL. The local repository will be tracked (at some branch) and updates
-from that local repo are pulled when packages are updated.
+通过传递给 `add` 一个git仓库的**本地路径**来代替git仓库的 URL，它能像 URL 一样工作。将跟踪本地存储库（在某个分支），并在更新包时从该本地存储库中提取更新。
 
 !!! warning
-    Note that tracking a package through `add` is distinct from
-    `develop` (which is described in the next session). When using `add` on a local
-    git repository, changes to files in the local package repository will not
-    immediately be reflected when loading that package. The changes would have to be
-    committed and the packages updated in order to pull in the changes. In the
-    majority of cases, you want to use `develop` on a local path, **not `add`**.
+    请注意，通过 `add` 跟踪包的方式不同于 `develop`（将在下一节中描述）。在本地 git 存储库上使用 `add` 时，在加载该包时不会立即反映对本地包存储库中文件的更改。必须提交更改并更新软件包才能引入更改。在大多数情况下，您希望在本地路径上使用 `develop  ，**而非 `add`**。
 
-### [Developing packages](@id developing)
+### [开发中的包](@id developing)
 
-By only using `add` your environment always has a "reproducible state", in other words, as long as the repositories and registries used are still accessible
-it is possible to retrieve the exact state of all the dependencies in the environment. This has the advantage that you can send your environment (`Project.toml`
-and `Manifest.toml`) to someone else and they can [`Pkg.instantiate`](@ref) that environment in the same state as you had it locally.
-However, when you are developing a package, it is more convenient to load packages at their current state at some path. For this reason, the `dev` command exists.
+通过仅使用 `add`，您的环境始终具有“可重现状态”，换句话说，只要使用的仓库和注册表仍然可以访问，就可以检索环境中所有依赖项的确切状态。这样做的好处是您可以将您的环境 (`Project.toml` 和 `Manifest.toml`) 发送给其他人，并且他们可以 [`Pkg.instantiate`](@ref) 此环境，来重现您本地环境的相同状态。然而，当你在开发一个包时，在某个路径上加载它们的当前状态会更方便。因此，存在 `dev` 命令。
 
-Let's try to `dev` a registered package:
+让我们尝试 `dev` 一个已注册包：
 
 ```julia-repl
 (@v1.8) pkg> dev Example
@@ -207,21 +185,15 @@ Let's try to `dev` a registered package:
   [7876af07] + Example v0.5.4 `~/.julia/dev/Example`
 ```
 
-The `dev` command fetches a full clone of the package to `~/.julia/dev/` (the path can be changed by setting the environment variable `JULIA_PKG_DEVDIR`, the default being `joinpath(DEPOT_PATH[1],"dev")`).
-When importing `Example` julia will now import it from `~/.julia/dev/Example` and whatever local changes have been made to the files in that path are consequently
-reflected in the code loaded. When we used `add` we said that we tracked the package repository; we here say that we track the path itself.
-Note the package manager will never touch any of the files at a tracked path. It is therefore up to you to pull updates, change branches, etc.
-If we try to `dev` a package at some branch that already exists at `~/.julia/dev/` the package manager will simply re-use the existing path.
-If `dev` is used on a local path, that path to that package is recorded and used when loading that package.
-The path will be recorded relative to the project file, unless it is given as an absolute path.
+`dev` 命令将包的完整克隆 fetch 到 `~/.julia/dev/`（可以通过设置环境变量 `JULIA_PKG_DEVDIR` 来更改路径，默认为 `joinpath(DEPOT_PATH[1],"dev")`）。现在，当导入 `Example` 时， julia 将从 `~/.julia/dev/Example` 中导入它，对该路径中的文件所做的任何本地更改都会反映在加载的代码中。当使用 `add` 时，我们说跟踪了包存储库；在这里我们说跟踪了路径本身。请注意，包管理器永远不会触及跟踪路径中的任何文件，因此，拉取更新、更改分支等操作都由您自己决定。如果我们尝试 `dev` 已经存在于 `~/.julia/dev/` 的包上的某个分支，包管理器将简单地重新使用现有路径。如果在本地路径上使用 `dev`，该包的路径将被记录并在加载该包时使用。路径将相对于项目文件进行记录，除非它以绝对路径的形式给出。
 
-Let's try modify the file at  `~/.julia/dev/Example/src/Example.jl` and add a simple function:
+让我们尝试修改文件 `~/.julia/dev/Example/src/Example.jl` 并添加一个简单的函数：
 
 ```julia
 plusone(x::Int) = x + 1
 ```
 
-Now we can go back to the Julia REPL and load the package and run the new function:
+现在我们可以回到 Julia REPL 加载包并运行新函数：
 
 ```julia-repl
 julia> import Example
@@ -232,14 +204,9 @@ julia> Example.plusone(1)
 ```
 
 !!! warning
-    A package can only be loaded once per Julia session.
-    If you have run `import Example` in the current Julia session, you will
-    have to restart Julia to see the changes to Example.
-    [Revise.jl](https://github.com/timholy/Revise.jl/) can make this process
-    significantly more pleasant, but setting it up is beyond the scope of this guide.
+    每个 Julia 会话只能加载一次包。如果您已在当前 Julia 会话中运行过 `import Example`，则必须重新启动 Julia 才能看到对示例的更改。 [Revise.jl](https://github.com/timholy/Revise.jl/)可以使这个过程变得更轻松，但是设置它超出了本指南的范围。
 
-
-To stop tracking a path and use the registered version again, use `free`:
+要停止跟踪路径并再次使用已注册版本，请使用 `free`：
 
 ```julia-repl
 (@v1.8) pkg> free Example
@@ -250,53 +217,38 @@ To stop tracking a path and use the registered version again, use `free`:
   [7876af07] ~ Example v0.5.4 `~/.julia/dev/Example` ⇒ v0.5.3
 ```
 
-It should be pointed out that by using `dev` your project is now inherently stateful.
-Its state depends on the current content of the files at the path and the manifest cannot be "instantiated" by someone else without
-knowing the exact content of all the packages that are tracking a path.
+应该指出的是，通过使用 `dev` ,您的项目现在本质上是有状态的。它的状态取决于路径中文件的当前内容，并且在不知道跟踪路径中所有包的确切内容的情况下，manifest 不能被其他人“实例化”。
 
-Note that if you add a dependency to a package that tracks a local path, the Manifest (which contains the whole dependency graph) will become
-out of sync with the actual dependency graph. This means that the package will not be able to load that dependency since it is not recorded
-in the Manifest. To synchronize the Manifest, use the REPL command `resolve`.
+请注意，如果您向跟踪本地路径的包添加依赖项，则 Manifest（包含整个依赖关系图）将与实际依赖关系图不同步。这意味着包将无法加载该依赖项，因为它没有记录在 Manifest 中。要同步 Manifest，请使用 REPL 命令 `resolve`。
 
-In addition to absolute paths, `add` and `dev` can accept relative paths to packages.
-In this case, the relative path from the active project to the package is stored.
-This approach is useful when the relative location of tracked dependencies is more important than their absolute location.
-For example, the tracked dependencies can be stored inside of the active project directory.
-The whole directory can be moved and `Pkg` will still be able to find the dependencies
-because their path relative to the active project is preserved even though their absolute path has changed.
+除了绝对路径外，`add` 和 `dev` 还可以接受包的相对路径。在这种情况下，将存储从活动项目到包的相对路径。当被跟踪依赖项的相对位置比它们的绝对位置更重要时，这种方法很有用。例如，跟踪的依赖项可以存储在活动项目目录中。整个目录可以移动并且 `Pkg` 仍然能够找到依赖项，因为它们对于活动项目的相对路径被保留，即使它们的绝对路径已经发生改变。
 
+## 移除包
 
-## Removing packages
+可以使用 `pkg> rm Package` 从当前项目中移除包。这只会移除项目中存在的包；要移除仅作为依赖项存在的包，请使用 `pkg> rm --manifest DepPackage`。请注意，这将移除（递归地）`DepPackage` 依赖的所有包。
 
-Packages can be removed from the current project by using `pkg> rm Package`.
-This will only remove packages that exist in the project; to remove a package that only
-exists as a dependency use `pkg> rm --manifest DepPackage`.
-Note that this will remove all packages that (recursively) depend on `DepPackage`.
+## [更新包](@id updating)
 
-## [Updating packages](@id updating)
-
-When new versions of packages are released, it is a good idea to update. Simply calling `up` will try to update *all* the dependencies of the project
-to the latest compatible version. Sometimes this is not what you want. You can specify a subset of the dependencies to upgrade by giving them as arguments to `up`, e.g:
+发布新版本的软件包时，最好进行更新。只需调用 `up` 命令，尝试将项目的**所有依赖**更新到最新的兼容版本。有时这不是你想要的。您可以通过将依赖项的子集作为参数提供给 `up` 来指定要升级的包，例如：
 
 ```julia-repl
 (@v1.8) pkg> up Example
 ```
 
-This will only allow Example do upgrade. If you also want to allow dependencies of Example to upgrade (with the exception of packages that are in the project) you can pass the `--preserve=direct` flag.
+这将只允许 `Example` 进行升级。如果您还想允许 `Example` 的依赖项升级（项目中的包除外），您可以传递 `--preserve=direct` 参数。
 
 ```julia-repl
 (@v1.8) pkg> up --preserve=direct Example
 ```
 
-And if you also want to allow dependencies of Example that are also in the project to upgrade, you can use `--preserve=none`:
-
+如果您还想允许项目中的 `Example` 的依赖项进行升级，您可以使用 `--preserve=none`：
 
 ```julia-repl
 (@v1.8) pkg> up --preserve=none Example
 ```
-## Pinning a package
+## 固定包
 
-A pinned package will never be updated. A package can be pinned using `pin`, for example:
+固定包永远不会更新。可以使用 `pin` 来固定一个包，例如：
 
 ```julia-repl
 (@v1.8) pkg> pin Example
@@ -307,7 +259,7 @@ A pinned package will never be updated. A package can be pinned using `pin`, for
   [7876af07] ~ Example v0.5.3 ⇒ v0.5.3 ⚲
 ```
 
-Note the pin symbol `⚲` showing that the package is pinned. Removing the pin is done using `free`
+请注意 `⚲` 符号显示包已经被固定。要移除固定使用 `free` 命令：
 
 ```julia-repl
 (@v1.8) pkg> free Example
@@ -317,8 +269,9 @@ Note the pin symbol `⚲` showing that the package is pinned. Removing the pin i
   [7876af07] ~ Example v0.5.3 ⚲ ⇒ v0.5.3
 ```
 
-## Testing packages
+## 测试包
 
+可以使用 `test` 命令运行包的测试：
 The tests for a package can be run using `test` command:
 
 ```julia-repl
@@ -328,11 +281,9 @@ The tests for a package can be run using `test` command:
    Testing Example tests passed
 ```
 
-## Building packages
+## 构建包
 
-The build step of a package is automatically run when a package is first installed.
-The output of the build process is directed to a file.
-To explicitly run the build step for a package, the `build` command is used:
+首次安装包时，包的构建步骤会自动运行。构建过程的输出被定向到一个文件。要显式运行包的构建步骤，请使用 `build` 命令：
 
 ```julia-repl
 (@v1.8) pkg> build IJulia
@@ -343,12 +294,9 @@ julia> print(read(joinpath(homedir(), ".julia/scratchspaces/44cfe95a-1eb2-52ea-b
 [ Info: Installing Julia kernelspec in /home/kc/.local/share/jupyter/kernels/julia-1.8
 ```
 
-## [Interpreting and resolving version conflicts](@id conflicts)
+## [解释和解决版本冲突](@id conflicts)
 
-An environment consists of a set of mutually-compatible packages.
-Sometimes, you can find yourself in a situation in which two packages you'd like to use simultaneously
-have incompatible requirements.
-In such cases you'll get an "Unsatisfiable requirements" error:
+一个环境由一组相互兼容的包组成。有时，您会发现自己要同时使用的两个软件包对环境的要求互相不兼容。在这种情况下，您会收到“Unsatisfiable requirements”错误：
 
 ```@setup conflict
 using Pkg
@@ -370,81 +318,56 @@ reqs_data = Any[["A", "*"],
 print("pkg> add A\n", try resolve_tst(deps_data, reqs_data) catch e sprint(showerror, e) end)   # hide
 ```
 
-This message means that a package named `D` has a version conflict.
-Even if you have never `add`ed `D` directly, this kind of error can arise
-if `D` is required by other packages that you are trying to use.
+此消息意味着一个名为 `D` 的包有版本冲突，即使您从未直接 `add` 过 `D`。如果您尝试使用的其他软件包也需要 `D`，同样会出现这种错误。
 
 !!! note
-    When tackling these conflicts, first consider that the bigger a project gets, the more likely this is to happen.
-    Using targeted projects for a given task is highly recommended, and removing unused dependencies is a good first
-    step when hitting these issues.
-    For instance, a common pitfall is having more than a few packages in your default (i.e. `(@1.8)`) environment,
-    and using that as an environment for all tasks you're using julia for. It's better to create a dedicated project
-    for the task you're working on, and keep the dependencies there minimal. To read more see
-    [Working with Environments](@ref Working-with-Environments)
+    在处理这些冲突时，首先要考虑项目越大，发生这种情况的可能性就越大。强烈建议为给定任务使用专用项目，并且在遇到这些问题时删除未使用的依赖项。例如，一个常见的陷阱是，在您的默认环境（即 `(@1.8)`）中包含有多个包，并将其用作您使用 julia 执行的所有任务的环境。最好为您正在处理的任务创建一个专用项目，并将依赖关系保持在最低限度。要了解更多信息，请参阅 [使用“环境”](@ref Working-with-Environments)
 
-The error message has a lot of crucial information.
-It may be easiest to interpret piecewise:
+错误消息包含很多关键信息。分段解释可能最容易：
 
 ```
 Unsatisfiable requirements detected for package D [756980fe]:
  D [756980fe] log:
  ├─possible versions are: [0.1.0, 0.2.0-0.2.1] or uninstalled
 ```
-means that `D` has three released versions, `v0.1.0`, `v0.2.0`, and `v0.2.1`.
-You also have the option of not having it installed at all.
-Each of these options might have different implications for the set of other packages that can be installed.
 
-Crucially, notice the stroke characters (vertical and horizontal lines) and their indentation.
-Together, these connect *messages* to specific *packages*.
-For instance the right stroke of `├─` indicates that the message to its right (`possible versions...`)
-is connected to the package pointed to by its vertical stroke (`D`).
-This same principle applies to the next line:
+表示 `D` 具有三个发布版本，`v0.1.0`、`v0.2.0`和`v0.2.1`。您还可以选择根本不安装它。这些选项中的每一个都可能对可以安装的其他软件包集具有不同的含义。
+
+更重要的是，请注意笔画字符（垂直和水平线）及其缩进。这些字符组合在一起将*消息*连接到特定的*包*。例如，右边的笔划 `├─` 表示其右边的消息 (`possible versions...`) 连接到其垂直笔划指向的包(`D`) 。同样的规则适用于下一行：
 
 ```
  ├─restricted by compatibility requirements with B [f4259836] to versions: 0.1.0
 ```
-The vertical stroke here is also aligned under `D`, and thus this message
-is in reference to `D`.
-Specifically, there's some other package `B` that depends on version `v0.1.0` of `D`.
-Notice that this is not the newest version of `D`.
 
-Next comes some information about `B`:
+这里的垂直笔划也对齐在 `D` 下方，因此该消息是引用到 `D` 的。具体来说，还有另外的包 `B` 依赖于 `D` 的 `v0.1.0`版本. 请注意，这不是 `D` 的最新版本。
+
+接下来是一些关于 `B` 的信息：
 
 ```
  │ └─B [f4259836] log:
  │   ├─possible versions are: 1.0.0 or uninstalled
  │   └─restricted to versions * by an explicit requirement, leaving only versions 1.0.0
 ```
-The two lines below the first have a vertical stroke that aligns with `B`,
-and thus they provide information about `B`.
-They tell you that `B` has just one release, `v1.0.0`.
-You've not specified a particular version of `B` (`restricted to versions *` means that any version will do),
-but the `explicit requirement` means that you've asked for `B` to be part of your environment,
-for example by `pkg> add B`.
-You might have asked for `B` previously, and the requirement is still active.
 
-The conflict becomes clear with the line
+第一行下面的两行有一个与 `B` 对齐的垂直笔划，因此它们提供了关于 `B` 的信息。他们告诉你 `B` 只有一个版本 `v1.0.0`。您没有指定过 ` B` 的特定版本(`restricted to versions *` 表示任何版本都可以)，但是 `explicit requirement` 表明您要求B成为环境的一部分，例如曾执行过 `pkg> add B`。您之前可能已经添加过 `B` 了，但这里对特定版本的依赖仍然有效。
+
+冲突变得清晰了：
+
 ```
 └─restricted by compatibility requirements with C [c99a7cb2] to versions: 0.2.0 — no versions left
 ```
 
-Here again, the vertical stroke aligns with `D`: this means that `D` is *also* required by another package, `C`.
-`C` requires `v0.2.0` of `D`, and this conflicts with `B`'s need for `v0.1.0` of `D`.
-This explains the conflict.
+同样，垂直笔划与 `D` 对齐：这意味着 `D` *也*被 `C` 包依赖，`C` 依赖 `D` 的 `v0.2.0` 版本。这和 `B` 依赖 `D` 的 `v0.1.0` 版本是冲突的。
 
-But wait, you might ask, what is `C` and why do I need it at all?
-The next few lines introduce the problem:
+但是等等，你可能会问，`C` 是什么，我为什么需要它？接下来的几行介绍了这个问题：
 
 ```
    └─C [c99a7cb2] log:
      ├─possible versions are: [0.1.0-0.1.1, 0.2.0] or uninstalled
      └─restricted by compatibility requirements with A [29c70717] to versions: 0.2.0
 ```
-These provide more information about `C`, revealing that it has 3 released versions: `v0.1.0`, `v0.1.1`, and `v0.2.0`.
-Moreover, `C` is required by another package `A`.
-Indeed, `A`'s requirements are such that we need `v0.2.0` of `C`.
-`A`'s origin is revealed on the next lines:
+
+这些提供了有关 `C` 的更多信息，表明它有 3 个已发布版本：`v0.1.0`、`v0.1.1`和`v0.2.0`。此外，`C` 是另一个包 `A` 所必需的。确实，`A` 要求 `v0.2.0`版本的 `C`。 `A` 的起源在接下来的几行中揭示：
 
 ```
        └─A [29c70717] log:
@@ -452,33 +375,20 @@ Indeed, `A`'s requirements are such that we need `v0.2.0` of `C`.
          └─restricted to versions * by an explicit requirement, leaving only versions 1.0.0
 ```
 
-So we can see that `A` was `explicitly required, and in this case, it's because we were trying to
-`add` it to our environment.
+所以我们可以看到 `A` 是 `explicitly required` 的, 并且在此示例中，我们尝试将它 `add` 到我们的环境中。
 
-In summary, we explicitly asked to use `A` and `B`, but this gave a conflict for `D`.
-The reason was that `B` and `C` require conflicting versions of `D`.
-Even though `C` isn't something we asked for explicitly, it was needed by `A`.
+总之，我们明确要求使用 `A` 和 `B`，但这里显示了一个 `D` 的冲突，原因是 `B` 和 `C` 依赖的 `D` 的版本冲突。 尽管 `C` 不是我们明确要求的，但 `A` 是。
 
-To fix such errors, you have a number of options:
+要修复此类错误，您有多种选择：
 
-- try [updating your packages](@ref updating). It's possible the developers of these packages have recently released new versions that are mutually compatible.
-- remove either `A` or `B` from your environment. Perhaps `B` is left over from something you were previously working on, and you don't need it anymore. If you don't need `A` and `B` at the same time, this is the easiest way to fix the problem.
-- try reporting your conflict. In this case, we were able to deduce that `B` requires an outdated version of `D`. You could thus report an issue in the development repository of `B.jl` asking for an updated version.
-- try fixing the problem yourself.
-  This becomes easier once you understand `Project.toml` files and how they declare their compatibility requirements. We'll return to this example in [Fixing conflicts](@ref).
+- 尝试[更新包](@ref updating)。这些软件包的开发人员可能最近发布了相互兼容的新版本。
+- 从您的环境中删除 `A` 或删除 `B`。也许 `B` 是你以前工作的时候遗留下来的，你已经不再需要它了。如果您同时不需要 `A`和`B`，这是解决问题的最简单方法。
+- 尝试报告您的冲突。在这种情况下，我们能够推断出 `B` 依赖 `D` 的过时版本。 因此，您可以在 `B.jl` 的开发存储库中报告问题，要求更新 `D` 版本。
+- 尝试自己解决问题。一旦您了解 `Project.toml` 文件以及它们如何声明其兼容性要求，这将变得更容易。我们将在[修复冲突](@ref)中回到这个例子。
 
-## Garbage collecting old, unused packages
+## 垃圾收集旧的、未使用的包
 
-As packages are updated and projects are deleted, installed package versions and artifacts that were
-once used will inevitably become old and not used from any existing project.
-`Pkg` keeps a log of all projects used so it can go through the log and see exactly which projects still exist
-and what packages/artifacts those projects used.
-If a package or artifact is not marked as used by any project, it is added to a list of orphaned packages.
-Packages and artifacts that are in the orphan list for 30 days without being used again are deleted from the system on the next garbage collection.
-This timing is configurable via the `collect_delay` keyword argument to `Pkg.gc()`.
-A value of `0` will cause anything currently not in use to be collected immediately, skipping the orphans list entirely;
-If you are short on disk space and want to clean out as many unused packages and artifacts as possible, you may want to try this, but if you need these versions again, you will have to download them again.
-To run a typical garbage collection with default arguments, simply use the `gc` command at the `pkg>` REPL:
+随着包的更新和项目的删除，曾经使用过的已安装包的版本和组件将不可避免地变旧，并且不会再被任何现有项目使用。`Pkg` 保留所有项目的使用日志，以便它可以查看日志并准确查看哪些项目仍然存在，以及这些项目使用了哪些包/[artifacts](@ref Artifacts)。如果包或 artifacts 未被任何项目标记为正在使用，则会将其添加到孤立包列表中。处于孤立列表中 30 天未再次使用的包和 artifacts 会在下一次垃圾回收时从系统中删除。这个时间可以通过 `Pkg.gc()` 的 `collect_delay` 关键字参数来配置。值 `0` 将导致立即收集当前未使用的任何内容，完全跳过孤儿列表；如果您的磁盘空间不足，并且想清理尽可能多的未使用的包和 artifacts，您可能想尝试此参数，但如果您再次需要这些版本，则必须重新下载它们。要使用默认参数运行典型的垃圾收集，只需使用 `pkg>` REPL中的 `gc` 命令：
 
 ```julia-repl
 (@v1.8) pkg> gc
@@ -499,36 +409,28 @@ To run a typical garbage collection with default arguments, simply use the `gc` 
    Deleted 15 artifact installations (20.759 GiB)
 ```
 
-Note that only packages in `~/.julia/packages` are deleted.
+请注意，只有 `~/.julia/packages` 中的包被删除。
 
-## Offline Mode
+## 离线模式
 
-In offline mode, Pkg tries to do as much as possible without connecting
-to internet. For example, when adding a package Pkg only considers
-versions that are already downloaded in version resolution.
+在离线模式下，Pkg 尝试在不连接互联网的情况下尽可能做的更多。例如，当添加一个包时，Pkg 只考虑版本解析中已经下载的版本。
 
-To work in offline mode use `import Pkg; Pkg.offline(true)` or set the environment
-variable `JULIA_PKG_OFFLINE` to `"true"`.
+要在离线模式下工作，请使用 `import Pkg; Pkg.offline(true)` 或将环境变量 `JULIA_PKG_OFFLINE` 设置为 `"true"`。
 
-## Pkg client/server
+## Pkg 客户端/服务器
 
-When you add a new registered package, usually three things would happen:
+当你添加一个新的已注册包时，通常会发生三件事：
 
-1. update registries,
-2. download the source code of the package,
-3. if not available, download [artifacts](@ref Artifacts) required by the package.
+1. 更新注册表，
+2. 下载包的源代码，
+3. 如果不可用，请下载软件包所需的 [artifacts](@ref Artifacts)。
 
-The [General](https://github.com/JuliaRegistries/General) registry and most packages in it are
-developed on GitHub, while the artifacts data are hosted on various platforms. When the network
-connection to GitHub and AWS S3 is not stable, it is usually not a good experience to install or
-update packages. Fortunately, the pkg client/server feature improves the experience in the sense that:
+[General](https://github.com/JuliaRegistries/General) 注册表和其中的大多数包都是在 GitHub 上开发的，而 artifacts 数据则托管在各种平台上。当与 GitHub 和 AWS S3 的网络连接不稳定时，安装或更新包的体验通常不是很好。幸运的是，pkg 客户端/服务器功能在以下方面改善了体验：
 
-1. If set, the pkg client would first try to download data from the pkg server,
-2. if that fails, then it falls back to downloading from the original sources (e.g., GitHub).
+1. 如果设置，pkg 客户端将首先尝试从 pkg 服务器下载数据，
+2. 如果失败，则返回到从原始来源（例如，GitHub）下载。
 
-Since Julia 1.5, `https://pkg.julialang.org` provided by the JuliaLang organization is used as the default
-pkg server. In most cases, this should be transparent, but users can still set/unset a pkg server
-upstream via the environment variable `JULIA_PKG_SERVER`.
+从 Julia 1.5 开始，`https://pkg.julialang.org` 由 JuliaLang 组织提供并作为默认 pkg 服务器。在大多数情况下，这应该是透明的，但用户仍然可以通过环境变量 `JULIA_PKG_SERVER` 设置/取消设置上游的 pkg 服务器。
 
 ```julia
 # manually set it to some pkg server
@@ -540,20 +442,16 @@ julia> ENV["JULIA_PKG_SERVER"] = ""
 ""
 ```
 
-For clarification, some sources are not provided by Pkg server
+澄清一下，Pkg 服务器未提供某些来源。
 
-* packages/registries fetched via `git`
+* 通过 `git` 获取包/注册表
   * `]add https://github.com/JuliaLang/Example.jl.git`
-  * `]add Example#v0.5.3` (Note that this is different from `]add Example@0.5.3`)
-  * `]registry add https://github.com/JuliaRegistries/General.git`, including registries installed by Julia before 1.4.
-* artifacts without download info
+  * `]add Example#v0.5.3`（请注意，这与 `]add Example@0.5.3` 不同）
+  * `]registry add https://github.com/JuliaRegistries/General.git`，包括 Julia 在 1.4 之前安装的注册表。
+* 没有下载信息的artifacts
   * [TestImages](https://github.com/JuliaImages/TestImages.jl/blob/eaa94348df619c65956e8cfb0032ecddb7a29d3a/Artifacts.toml#L1-L2)
 
-
 !!! note
-    If you have a new registry installed via pkg server, then it's impossible for old Julia versions to
-    update the registry because Julia before 1.4 doesn't know how to fetch new data.
-    Hence, for users that frequently switch between multiple Julia versions, it is recommended to
-    still use git-controlled registries.
+    如果您通过 pkg 服务器安装了新的注册表，那么旧 Julia 版本不可能更新注册表，因为 1.4 之前的 Julia 不知道如何获取新数据。因此，对于经常在多个 Julia 版本之间切换的用户，建议仍然使用 git 控制注册表。
 
-For the deployment of pkg server, please refer to [PkgServer.jl](https://github.com/JuliaPackaging/PkgServer.jl).
+pkg server 的部署请参考 [PkgServer.jl](https://github.com/JuliaPackaging/PkgServer.jl)。

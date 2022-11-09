@@ -1,9 +1,9 @@
-# [**6.** Compatibility](@id Compatibility)
 
-Compatibility refers to the ability to restrict the versions of the dependencies that your project is compatible with.
-If the compatibility for a dependency is not given, the project is assumed to be compatible with all versions of that dependency.
+# [**6.** 兼容性](@id Compatibility)
 
-Compatibility for a dependency is entered in the `Project.toml` file as for example:
+兼容性是指，限制你的项目兼容依赖包的版本的能力。如果未给出依赖包的兼容性，则假定项目与该依赖包的所有版本兼容。
+
+在 `Project.toml` 文件中输入依赖包的兼容性，例如：
 
 ```toml
 [compat]
@@ -11,60 +11,49 @@ julia = "1.6"
 Example = "0.5"
 ```
 
-After a compatibility entry is put into the project file, `up` can be used to apply it.
+将兼容性条目放入项目文件后，`up` 命令可用于使它生效。
 
-The format of the version specifier is described in detail below.
+下面详细描述版本说明符的格式。
 
 !!! info
-    Use the command `compat` to edit the compat entries in the Pkg REPL, or manually edit the project file.
+    使用 `compat` 命令编辑 Pkg REPL 中的兼容条目，或手动编辑项目文件。
 
-## Version specifier format
+## 版本说明符格式
 
-Similar to other package managers, the Julia package manager respects [semantic versioning](https://semver.org/) (semver).
-As an example, a version specifier given as e.g. `1.2.3` is therefore assumed to be compatible with the versions `[1.2.3 - 2.0.0)` where `)` is a non-inclusive upper bound.
-More specifically, a version specifier is either given as a **caret specifier**, e.g. `^1.2.3`  or as a **tilde specifier**, e.g. `~1.2.3`.
-Caret specifiers are the default and hence `1.2.3 == ^1.2.3`. The difference between a caret and tilde is described in the next section.
-The union of multiple version specifiers can be formed by comma separating individual version specifiers, e.g.
+与其他包管理器类似，Julia 包管理器尊重[语义版本控制](https://semver.org/)(semver)。作为示例，假定版本说明符 `1.2.3` 与版本 `[1.2.3 - 2.0.0)`（`)` 指非闭合上界）是兼容的。更确切地说，版本说明符要么是**插入(caret)说明符**，例如 `^1.2.3`， 要么是**波浪(tilde)说明符**，例如 `~1.2.3`。插入说明符是默认值，因此 `1.2.3 == ^1.2.3`。插入符号和波浪号之间的区别将在下一节中描述。多个版本说明符的并集可以通过逗号分隔各个版本说明符来组成，例如
+
 ```toml
 [compat]
-Example = "1.2, 2"
+Example = "1.2, 3"
 ```
-will result in `[1.2.0, 3.0.0)`.  Note leading zeros are treated differently, e.g. `Example = "0.2, 1"` would only result in `[0.2.0 - 0.3.0) ∪ [1.0.0 - 2.0.0)`. See the next section for more information on versions with leading zeros.
 
-### [Behavior of versions with leading zeros (0.0.x and 0.x.y)](@id compat-pre-1.0)
+将得到 `[1.2.0, 3.0.0)`。请注意，前导零的处理方式不同，例如 `Example = "0.2, 1"` 只会得到 `[0.2.0 - 0.3.0) ∪ [1.0.0 - 2.0.0)`。有关带前导零的版本号的更多信息，请参阅下一节。
 
-While the semver specification says that all versions with a major version of 0 (versions before 1.0.0) are incompatible
-with each other, we have decided to only apply that for when both the major and minor versions are zero. In other words,
-0.0.1 and 0.0.2 are considered incompatible. A pre-1.0 version with non-zero minor version (`0.a.b` with `a != 0`) is
-considered compatible with versions with the same minor version and smaller or equal patch versions (`0.a.c` with `c <= b`);
-i.e., the versions 0.2.2 and 0.2.3 are compatible with 0.2.1 and 0.2.0. Versions with a major version of 0 and different
-minor versions are not considered compatible, so the version 0.3.0 might have breaking changes from 0.2.0. To that end, the
-`[compat]` entry:
+### [带前导零版本号的行为(`0.0.x` 和 `0.x.y`)](@id compat-pre-1.0)
+
+虽然 semver 规范说所有主要版本为 0 的版本（`1.0.0` 之前的版本）彼此不兼容，但我们决定仅在主要和次要版本号都为零时应用它。换句话说，`0.0.1` 和 `0.0.2` 被认为是不兼容的。具有非零次要版本号（`0.a.b` 且 `a != 0`）的 `pre-1.0` 版本，被认为与具有相同次要版本号，以及较小或相等补丁版本号（`0.a.c` 且 `c <= b`）的版本兼容；即，版本 `0.2.2`、`0.2.3` 与 `0.2.1`、`0.2.0` 兼容。主要版本号为 0 及次要版本号不相同的版本被认为是不兼容的，因此版本 0.3.0 可能与 0.2.0 相比具有重大更改。为此， `[compat]` 条目：
 
 ```toml
 [compat]
 Example = "0.0.1"
 ```
 
-results in a versionbound on `Example` as `[0.0.1, 0.0.2)` (which is equivalent to only the version 0.0.1), while the
-`[compat]` entry:
+得到 `Example` 的版本边界为 `[0.0.1, 0.0.2)`（仅相当于版本 0.0.1），而`[compat]` 条目：
 
 ```toml
 [compat]
 Example = "0.2.1"
 ```
 
-results in a versionbound on Example as `[0.2.1, 0.3.0)`.
+得到 `Example` 的版本边界为 `[0.2.1, 0.3.0)`。
 
-In particular, a package may set `version = "0.2.4"` when it has feature additions compared to 0.2.3 as long as it
-remains backward compatible with 0.2.0.  See also [The `version` field](@ref).
+特别是，当一个包与 `0.2.3` 相比具有附加功能时，它可能设置 `version = "0.2.4"`，只要它保持与 `0.2.0` 的向后兼容。另请参见[`version` 字段](@ref)。
 
-### Caret specifiers
+### 插入说明符
 
-A caret (`^`) specifier allows upgrade that would be compatible according to semver. This is the default behavior if no specifier is used.
-An updated dependency is considered compatible if the new version does not modify the left-most non zero digit in the version specifier.
+插入符号 (`^`) 说明符允许根据 semver 规则兼容的升级。如果没有使用说明符，这是默认行为。如果新版本没有修改版本说明符中最左边的非零数字，则更新的依赖项被认为是兼容的。
 
-Some examples are shown below.
+一些示例如下所示。
 
 ```toml
 [compat]
@@ -77,13 +66,9 @@ PkgF = "^0.0"   # [0.0.0, 0.1.0)
 PkgG = "^0"     # [0.0.0, 1.0.0)
 ```
 
-### Tilde specifiers
+### 波浪符说明符
 
-A tilde specifier provides more limited upgrade possibilities. When specifying major, minor
-and patch versions, or when specifying major and minor versions, only the patch version is
-allowed to change. If you only specify a major version, then both minor and patch versions
-are allowed to be upgraded (`~1` is thus equivalent to `^1`).
-For example:
+波浪号说明符提供更有限的升级可能性。当指定了主要、次要和补丁版本号时，或指定了主要和次要版本号时，只允许更改补丁版本。如果您只指定一个主要版本，则允许升级次要版本号和补丁版本号（`~1` 因此等同于 `^1`）。例如：
 
 ```toml
 [compat]
@@ -96,11 +81,11 @@ PkgF = "~0.0"   # [0.0.0, 0.1.0)
 PkgG = "~0"     # [0.0.0, 1.0.0)
 ```
 
-For all versions with a major version of 0 the tilde and caret specifiers are equivalent.
+对于主要版本号为 0 的所有版本，波浪说明符和插入说明符是等效的。
 
-### Equality specifier
+### 相等说明符
 
-Equality can be used to specify exact versions:
+相等说明符可用于指定具体的版本：
 
 ```toml
 [compat]
@@ -108,9 +93,9 @@ PkgA = "=1.2.3"           # [1.2.3, 1.2.3]
 PkgA = "=0.10.1, =0.10.3" # 0.10.1 or 0.10.3
 ```
 
-### Inequality specifiers
+### 不等说明符
 
-Inequalities can also be used to specify version ranges:
+不等式也可用于指定版本范围：
 
 ```toml
 [compat]
@@ -119,9 +104,9 @@ PkgC = "≥ 1.2.3"  # [1.2.3,  ∞)
 PkgD = "< 1.2.3"  # [0.0.0, 1.2.3) = [0.0.0, 1.2.2]
 ```
 
-### Hyphen specifiers
+### 连字说明符
 
-Hyphen syntax can also be used to specify version ranges. Make sure that you have a space on both sides of the hyphen.
+连字符语法也可用于指定版本范围。确保连字符的两边都有空格。
 
 ```toml
 [compat]
@@ -129,7 +114,7 @@ PkgA = "1.2.3 - 4.5.6" # [1.2.3, 4.5.6]
 PkgA = "0.2.3 - 4.5.6" # [0.2.3, 4.5.6]
 ```
 
-Any unspecified trailing numbers in the first end-point are considered to be zero:
+第一个端点中任何未指定的尾随数字都被视为零：
 
 ```toml
 [compat]
@@ -139,7 +124,7 @@ PkgA = "0.2 - 4.5.6"   # [0.2.0, 4.5.6]
 PkgA = "0.2 - 0.5.6"   # [0.2.0, 0.5.6]
 ```
 
-Any unspecified trailing numbers in the second end-point will be considered to be wildcards:
+第二个端点中任何未指定的尾随数字将被视为通配符：
 
 ```toml
 [compat]
@@ -158,38 +143,19 @@ PkgA = "0.2 - 0"       # 0.2.0 - 0.*.* = [0.2.0, 1.0.0)
 ```
 
 
-## Fixing conflicts
+## 修复冲突
 
-Version conflicts were introduced previously with an [example](@ref conflicts)
-of a conflict arising in a package `D` used by two other packages, `B` and `C`.
-Our analysis of the error message revealed that `B` is using an outdated
-version of `D`.
-To fix it, the first thing to try is to `pkg> dev B` so that
-you can modify `B` and its compatibility requirements.
-If you open its `Project.toml` file in an editor, you would probably notice something like
+版本冲突之前是通过 [example](@ref conflicts) 介绍的，该冲突是由包 `D` 被其他两个包 `B` 和 `C` 使用产生的冲突。我们对错误消息的分析显示 `B` 使用了 `D` 的过时版本。要修复它，首先要尝试的是 `pkg> dev B`以便您可以修改 `B` 及其兼容性要求。如果您在编辑器中打开它的 `Project.toml` 文件，您可能会注意到类似
 
 ```toml
 [compat]
 D = "0.1"
 ```
+通常第一步是将其修改为类似
 
-Usually the first step is to modify this to something like
 ```toml
 [compat]
 D = "0.1, 0.2"
 ```
+这表示 `B` 兼容 0.1 和 0.2 版本；如果你执行 `pkg> up`，这会修复包错误。但是，您首先需要解决一个主要问题：可能在 `D` 的 `v0.2` 版本中存在和 `B` 不兼容的更改。在继续之前，您应该更新所有包，然后运行 `B`​​ 的测试，扫描 `pkg> test B` 的输出以确保 `D` 的 `v0.2` 版本实际上正在使用 。（可能有一个 `D` 的额外的依赖关系将其固定到 `v0.1`，并且您不希望被误导以为您已经在新版本上测试了 `B`。）如果使用了新版本并且测试仍然通过，您可以假设B不需要任何特性更新以适应 `D` 的 `v0.2` 版本; 您可以安全地将此更改作为拉取请求提交到 `B` 以便发布新版本。相反，如果抛出错误，则表明 `B` 需要更广泛的更新以兼容 `D` 的最新版本。需要完成这些更新，才能同时使用 `A` 和 `B`。但是，您可以继续彼此独立地使用它们。
 
-This indicates that `B` is compatible with both versions 0.1 and version 0.2; if you `pkg> up`
-this would fix the package error.
-However, there is one major concern you need to address first: perhaps there was an incompatible change
-in `v0.2` of `D` that breaks `B`.
-Before proceeding further, you should update all packages and then run `B`'s tests, scanning the
-output of `pkg> test B` to be sure that `v0.2` of `D` is in fact being used.
-(It is possible that an additional dependency of `D` pins it to `v0.1`, and you wouldn't want to be misled into thinking that you had tested `B` on the newer version.)
-If the new version was used and the tests still pass,
-you can assume that `B` didn't need any further updating to accommodate `v0.2` of `D`;
-you can safely submit this change as a pull request to `B` so that a new release is made.
-If instead an error is thrown, it indicates that `B` requires more extensive updates to be
-compatible with the latest version of `D`; those updates will need to be completed before
-it becomes possible to use both `A` and `B` simultaneously.
-You can, though, continue to use them independently of one another.

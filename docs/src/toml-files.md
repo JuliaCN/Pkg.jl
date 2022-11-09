@@ -1,86 +1,68 @@
+
 # [**10.** `Project.toml` and `Manifest.toml`](@id Project-and-Manifest)
 
-Two files that are central to Pkg are `Project.toml` and `Manifest.toml`. `Project.toml`
-and `Manifest.toml` are written in [TOML](https://github.com/toml-lang/toml) (hence the
-`.toml` extension) and include information about dependencies, versions, package names,
-UUIDs etc.
+Pkg 的两个核心文件是 `Project.toml` 和 `Manifest.toml`。`Project.toml` 和 `Manifest.toml` 都是用 [TOML](https://github.com/toml-lang/toml)（因此是 `.toml` 扩展名）编写的，包括有关依赖项、版本、包名称、UUID 等的信息。
 
 !!! note
-    The `Project.toml` and `Manifest.toml` files are not only used by the package manager;
-    they are also used by Julia's code loading, and determine e.g. what `using Example`
-    should do. For more details see the section about
-    [Code Loading](https://docs.julialang.org/en/v1/manual/code-loading/)
-    in the Julia manual.
-
+    `Project.toml` 和 `Manifest.toml` 文件不仅由包管理器使用；Julia 的代码加载也使用它们，并确定例如 `using Example` 应该做什么。有关更多详细信息，请参阅 Julia 手册中有关 [代码加载](https://docs.julialang.org/en/v1/manual/code-loading/) 的部分。
 
 ## `Project.toml`
 
-The project file describes the project on a high level, for example, the package/project
-dependencies and compatibility constraints are listed in the project file. The file entries
-are described below.
+项目文件从高层次上描述了项目，例如，项目文件中列出了包/项目的依赖关系和兼容性约束。文件条目如下所述。
 
+### `authors` 字段
 
-### The `authors` field
+对于包，`authors` 可选字段是描述包作者的字符串列表，格式为 `NAME <EMAIL>`。例如：
 
-For a package, the optional `authors` field is a list of strings describing the
-package authors, in the form `NAME <EMAIL>`. For example:
 ```toml
 authors = ["Some One <someone@email.com>",
            "Foo Bar <foo@bar.com>"]
 ```
 
+### `name` 字段
 
-### The `name` field
+包/项目的名称由 `name` 字段决定，例如：
 
-The name of the package/project is determined by the `name` field, for example:
 ```toml
 name = "Example"
 ```
-The name must be a valid [identifier](https://docs.julialang.org/en/v1/base/base/#Base.isidentifier)
-(a sequence of Unicode characters that does not start with a number and is neither `true` nor `false`).
-For packages, it is recommended to follow the
-[package naming guidelines](@ref Package-naming-guidelines). The `name` field is mandatory
-for packages.
 
+名称必须是有效[标识符](https://docs.julialang.org/en/v1/base/base/#Base.isidentifier)（不以数字开头且既不是 `true` 也不是的 `false`  Unicode 字符序列）。对于包，建议遵循 [包命名准则](@ref Package-naming-guidelines)。`name` 字段对于包是必需的。
 
-### The `uuid` field
+### `uuid` 字段
 
-`uuid` is a string with a [universally unique identifier]
-(https://en.wikipedia.org/wiki/Universally_unique_identifier) for the package/project, for example:
+`uuid` 是包/项目 [通用唯一标识符]( https://en.wikipedia.org/wiki/Universally_unique_identifier ) 字符串，例如：
+
 ```toml
 uuid = "7876af07-990d-54b4-ab0e-23690620f79a"
 ```
-The `uuid` field is mandatory for packages.
+
+`uuid` 字段对于包是必需的。
 
 !!! note
-    It is recommended that `UUIDs.uuid4()` is used to generate random UUIDs.
+    建议使用 `UUIDs.uuid4()` 生成随机 UUID。
 
+### `version` 字段
 
-### The `version` field
+`version` 是包/项目版本号的字符串。它应该由三个数字组成：主要版本号、次要版本号和补丁号，用 `.` 分隔，例如：
 
-`version` is a string with the version number for the package/project. It should consist of
-three numbers, major version, minor version, and patch number, separated with a `.`, for example:
 ```toml
 version = "1.2.5"
 ```
-Julia uses [Semantic Versioning](https://semver.org/) (SemVer) and the `version` field
-should follow SemVer. The basic rules are:
-* Before 1.0.0, anything goes, but when you make breaking changes the minor version should
-  be incremented.
-* After 1.0.0 only make breaking changes when incrementing the major version.
-* After 1.0.0 no new public API should be added without incrementing the minor version.
-  This includes, in particular, new types, functions, methods, and method overloads, from
-  `Base` or other packages.
-See also the section on [Compatibility](@ref).
 
-Note that Pkg.jl deviates from the SemVer specification when it comes to versions pre-1.0.0. See
-the section on [pre-1.0 behavior](@ref compat-pre-1.0) for more details.
+Julia 使用[语义版本控制](https://semver.org/)(SemVer)，该 `version` 字段应遵循 SemVer。基本规则是：
 
+* 在 1.0.0 之前，一切正常，但是当您进行重大更改时，次要版本应该增加。
+* 在 1.0.0 之后，仅在增加主要版本时进行重大更改。
+* 在 1.0.0 之后，如果不增加次要版本，则不应添加新的公共 API。这尤其包括来自 `Base` 或其他包的新类型、函数、方法和方法重载 。
 
-### The `[deps]` section
+另请参阅[兼容性](@ref Compatibility)部分。
 
-All dependencies of the package/project are listed in the `[deps]` section. Each dependency
-is listed as a name-uuid pair, for example:
+请注意，当涉及到 1.0.0 之前的版本时，`Pkg.jl` 偏离了 SemVer 规范。有关详细信息，请参阅 [pre-1.0 行为](@ref compat-pre-1.0) 部分。
+
+### `[deps]` 节
+
+该节列出了包/项目的所有依赖项[deps]。每个依赖项都以“名称-uuid”对的形式列出，例如：
 
 ```toml
 [deps]
@@ -88,15 +70,11 @@ Example = "7876af07-990d-54b4-ab0e-23690620f79a"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 ```
 
-Typically it is not needed to manually add entries to the `[deps]` section; this is instead
-handled by Pkg operations such as `add`.
+通常不需要手动向 `[deps]` 节添加条目；这由 Pkg 操作来处理，例如 `add`。
 
+### `[compat]` 节
 
-### The `[compat]` section
-
-Compatibility constraints for the dependencies listed under `[deps]` can be listed in the
-`[compat]` section.
-Example:
+`[deps]` 下面列出的依赖项的兼容性约束可以在该 `[compat]` 节中列出。例子：
 
 ```toml
 [deps]
@@ -106,9 +84,7 @@ Example = "7876af07-990d-54b4-ab0e-23690620f79a"
 Example = "1.2"
 ```
 
-The [Compatibility](@ref) section describes the different possible compatibility
-constraints in detail. It is also possible to list constraints on `julia` itself, although
-`julia` is not listed as a dependency in the `[deps]` section:
+兼容性章节详细描述了不同的可能兼容性约束。也可以列出 `julia` 自身的约束，尽管 `julia` 未在 `[deps]` 节中列为依赖项：
 
 ```toml
 [compat]
@@ -118,20 +94,14 @@ julia = "1.1"
 
 ## `Manifest.toml`
 
-The manifest file is an absolute record of the state of the packages in the environment.
-It includes exact information about (direct and indirect) dependencies of the project.
-Given a `Project.toml` + `Manifest.toml` pair, it is possible to instantiate the exact same
-package environment, which is very useful for reproducibility.
-For the details, see [`Pkg.instantiate`](@ref).
+manifest 文件是环境中包状态的绝对记录。它包括有关项目（直接和间接）依赖项的确切信息。给定一对 `Project.toml` 和 `Manifest.toml`，可以实例化完全相同的包环境，这对于可复现性非常有用。有关详细信息，请参阅 [`Pkg.instantiate`](@ref)。
 
 !!! note
-    The `Manifest.toml` file is generated and maintained by Pkg and, in general, this file
-    should *never* be modified manually.
+    `Manifest.toml` 文件由 Pkg 生成和维护，一般情况下，不应手动修改此文件。
 
+### `Manifest.toml` 条目
 
-### `Manifest.toml` entries
-
-There are three top-level entries in the manifest which could look like this:
+manifest 中有三个顶级条目，如下所示：
 
 ```toml
 julia_version = "1.8.2"
@@ -139,33 +109,21 @@ manifest_format = "2.0"
 project_hash = "4d9d5b552a1236d3c1171abf88d59da3aaac328a"
 ```
 
-This shows the Julia version the manifest was created on, the "format" of the manifest
-and a hash of the project file, so that it is possible to see when the manifest is stale
-compared to the project file.
+这显示了创建 manifest 的 Julia 版本、manifest 的“格式”和项目文件的哈希值，这样就可以看到 manifest 与项目文件相比什么时候过时了。
 
-Each dependency has its own section in the manifest file, and its content varies depending
-on how the dependency was added to the environment. Every
-dependency section includes a combination of the following entries:
+每个依赖项在 manifest 文件中都有自己的节，其内容根据依赖项添加到环境的方式而有所不同。每个依赖项的节都包含以下条目的组合：
 
-* `uuid`: the [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier)
-  for the dependency, for example `uuid = "7876af07-990d-54b4-ab0e-23690620f79a"`.
-* `deps`: a vector listing the dependencies of the dependency, for example
-  `deps = ["Example", "JSON"]`.
-* `version`: a version number, for example `version = "1.2.6"`.
-* `path`: a file path to the source code, for example `path = /home/user/Example`.
-* `repo-url`: a URL to the repository where the source code was found,
-  for example `repo-url = "https://github.com/JuliaLang/Example.jl.git"`.
-* `repo-rev`: a git revision, for example a branch `repo-rev = "master"`
-  or a commit `repo-rev = "66607a62a83cb07ab18c0b35c038fcd62987c9b1"`.
-* `git-tree-sha1`: a content hash of the source tree, for example
-  `git-tree-sha1 = "ca3820cc4e66f473467d912c4b2b3ae5dc968444"`.
+* `uuid`: 依赖项的 [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier)，例如 `uuid = "7876af07-990d-54b4-ab0e-23690620f79a"`。
+* `deps`: 一个向量，列出依赖项的依赖项，例如 `deps = ["Example", "JSON"]`。
+* `version`: 版本号，例如 `version = "1.2.6"`。
+* `path`: 源代码的文件路径，例如 `path = /home/user/Example`。
+* `repo-url`: 源代码存储库的 URL ，例如 `repo-url = "https://github.com/JuliaLang/Example.jl.git"`。
+* `repo-rev`: git 存储库的修订版, 例如一个分支 `repo-rev = "master"` 或一个提交 `repo-rev = "66607a62a83cb07ab18c0b35c038fcd62987c9b1"`。
+* `git-tree-sha1`: git 源码树的哈希， 例如 `git-tree-sha1 = "ca3820cc4e66f473467d912c4b2b3ae5dc968444"`。
 
+#### 已添加的包
 
-#### Added package
-
-When a package is added from a package registry, for example by invoking `pkg> add Example`
-or with a specific version `pkg> add Example@1.2`, the resulting `Manifest.toml` entry looks
-like:
+当从包注册表添加包时，例如通过调用 `pkg> add Example` 或使用特定版本 `pkg> add Example@1.2`，生成的 `Manifest.toml` 条目如下所示：
 
 ```toml
 [[deps.Example]]
@@ -175,14 +133,11 @@ uuid = "7876af07-990d-54b4-ab0e-23690620f79a"
 version = "1.2.3"
 ```
 
-Note, in particular, that no `repo-url` is present, since that information is included in
-the registry where this package was found.
+请特别注意，没有 `repo-url` 存在，因为该信息包含在能够找到此包的注册表中。
 
-#### Added package by branch
+#### 按分支添加的包
 
-The resulting dependency section when adding a package specified by a branch, e.g.
-`pkg> add Example#master` or `pkg> add https://github.com/JuliaLang/Example.jl.git`,
-looks like:
+添加由分支指定的包时生成的 `[deps]` 节，例如 `pkg> add Example#masteror` 或 `pkg> add https://github.com/JuliaLang/Example.jl.git`，如下所示：
 
 ```toml
 [[deps.Example]]
@@ -194,13 +149,11 @@ uuid = "7876af07-990d-54b4-ab0e-23690620f79a"
 version = "1.2.4"
 ```
 
-Note that both the branch we are tracking (`master`) and the remote repository url
-(`"https://github.com/JuliaLang/Example.jl.git"`) are stored in the manifest.
+请注意，我们正在跟踪的分支 (`master`) 和远程存储库 url (`"https://github.com/JuliaLang/Example.jl.git"`) 都存储在 manifest 中。
 
-#### Added package by commit
+#### 按提交添加的包
 
-The resulting dependency section when adding a package specified by a commit, e.g.
-`pkg> add Example#cf6ba6cc0be0bb5f56840188563579d67048be34`, looks like:
+添加由提交指定的包时生成的 `[deps]` 节，例如 `pkg> add Example#cf6ba6cc0be0bb5f56840188563579d67048be34`，如下所示：
 
 ```toml
 [[deps.Example]]
@@ -212,13 +165,11 @@ uuid = "7876af07-990d-54b4-ab0e-23690620f79a"
 version = "1.2.4"
 ```
 
-The only difference from tracking a branch is the content of `repo-rev`.
+与跟踪分支的唯一区别是 `repo-rev` 的内容。
 
-#### Developed package
+#### 开发包
 
-The resulting dependency section when adding a package with `develop`,
-e.g. `pkg> develop Example` or `pkg> develop /path/to/local/folder/Example`,
-looks like:
+使用 `develop` 命令添加包时生成的 `[deps]` 节，例如 `pkg> develop Example` 或 `pkg> develop /path/to/local/folder/Example`，如下所示：
 
 ```toml
 [[deps.Example]]
@@ -228,13 +179,11 @@ uuid = "7876af07-990d-54b4-ab0e-23690620f79a"
 version = "1.2.4"
 ```
 
-Note that the path to the source code is included, and changes made to that
-source tree is directly reflected.
+请注意，包含源代码的路径，并且直接反映对该源代码树所做的更改。
 
-#### Pinned package
+#### 已固定的包
 
-Pinned packages are also recorded in the manifest file; the resulting
-dependency section e.g. `pkg> add Example; pin Example` looks like:
+已固定的包也记录在 manifest 文件中，例如由 `pkg> add Example; pin Example` 生成的 `[deps]` 节如下所示：
 
 ```toml
 [[deps.Example]]
@@ -244,16 +193,11 @@ pinned = true
 uuid = "7876af07-990d-54b4-ab0e-23690620f79a"
 version = "1.2.4"
 ```
+唯一的不同是附加了 `pinned = true` 条目。
 
-The only difference is the addition of the `pinned = true` entry.
+#### 多个同名的包
 
-#### Multiple packages with the same name
-
-Julia differentiates packages based on UUID, which means that the name alone is not enough
-to identify a package. It is possible to have multiple packages in the same environment
-with the same name, but with different UUID. In such a situation the `Manifest.toml` file
-looks a bit different. Consider for example the situation where you have added `A` and `B`
-to your environment, and the `Project.toml` file looks as follows:
+Julia 根据 UUID 区分包，这意味着仅靠名称不足以识别包。在同一个环境中可以有多个包具有相同的名称，但具有不同的 UUID。在这种情况下，`Manifest.toml` 文件看起来有点不同。例如，考虑您已将包 `A` 和 `B` 添加到您的环境的情况，文件 `Project.toml` 如下所示：
 
 ```toml
 [deps]
@@ -261,10 +205,7 @@ A = "ead4f63c-334e-11e9-00e6-e7f0a5f21b60"
 B = "edca9bc6-334e-11e9-3554-9595dbb4349c"
 ```
 
-If `A` now depends on `B = "f41f7b98-334e-11e9-1257-49272045fb24"`, i.e. *another* package
-named `B` there will be two different `B` packages in the `Manifest.toml` file. In this
-case, the full `Manifest.toml` file, with `git-tree-sha1` and `version` fields removed for
-clarity, looks like this:
+如果 `A` 现在依赖于 `B = "f41f7b98-334e-11e9-1257-49272045fb24"`，即*另一个*名为 `B` 的包，在 `Manifest.toml` 文件中将有两个不同的 `B` 包。在这种情况下，为清楚起见删除了 `git-tree-sha1` 和 `version` 字段的完整 `Manifest.toml` 文件如下所示：
 
 ```toml
 [[deps.A]]
@@ -279,5 +220,5 @@ uuid = "f41f7b98-334e-11e9-1257-49272045fb24"
 uuid = "edca9bc6-334e-11e9-3554-9595dbb4349c"
 ```
 
-There is now an array of the two `B` packages, and the `[deps]` section for `A` has been
-expanded to be explicit about which `B` package `A` depends on.
+现在，有一个包含两个 `B` 包的数组，并且 `A` 包的 `[deps]` 节已扩展为明确说明 `A` 依赖于哪个 `B` 包。
+

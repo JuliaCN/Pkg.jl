@@ -57,8 +57,8 @@ mktempdir() do tmp
     # Deploy HTML pages
     @info "Deploying HTML pages"
     deploydocs(
-        repo = "github.com/JuliaLang/Pkg.jl",
-        versions = ["v#.#", "dev" => "dev"],
+        repo = "github.com/ioxera/Pkg.jl",
+        versions = ["v#.#", "dev(zh_CN)" => "dev(zh_CN)"],
         push_preview = true,
     )
     # Put back PDF into docs/build/pdf
@@ -69,7 +69,7 @@ mktempdir() do tmp
     # Deploy PDF
     @info "Deploying PDF"
     deploydocs(
-        repo = "github.com/JuliaLang/Pkg.jl",
+        repo = "github.com/ioxera/Pkg.jl",
         target = "build/pdf",
         branch = "gh-pages-pdf",
         forcepush = true,

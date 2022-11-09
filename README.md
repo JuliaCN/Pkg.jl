@@ -1,3 +1,6 @@
+**!!! Note**
+This repository is unofficial and is only used for Chinese document translation.
+
 # Pkg
 
 Development repository for Julia's package manager,
