@@ -8,7 +8,7 @@ include("generate.jl")
 const formats = Any[
     Documenter.HTML(
         prettyurls = get(ENV, "CI", nothing) == "true",
-        canonical = "https://julialang.github.io/Pkg.jl/v1/",
+        canonical = "https://ioxera.github.io/Pkg.jl/dev/",
         assets = ["assets/custom.css"],
     ),
 ]
@@ -58,7 +58,7 @@ mktempdir() do tmp
     @info "Deploying HTML pages"
     deploydocs(
         repo = "github.com/ioxera/Pkg.jl",
-        versions = ["v#.#", "dev(zh_CN)" => "dev(zh_CN)"],
+        versions = ["v#.#", "dev" => "dev"],
         push_preview = true,
     )
     # Put back PDF into docs/build/pdf
