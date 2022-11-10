@@ -8,7 +8,7 @@ include("generate.jl")
 const formats = Any[
     Documenter.HTML(
         prettyurls = get(ENV, "CI", nothing) == "true",
-        canonical = "https://ioxera.github.io/Pkg.jl/dev/",
+        canonical = "https://cn.julialang.org/Pkg.jl/dev/",
         assets = ["assets/custom.css"],
     ),
 ]
