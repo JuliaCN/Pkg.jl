@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>5. 创建包 · Pkg.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link rel="canonical" href="https://julialang.github.io/Pkg.jl/v1/creating-packages/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/custom.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.png" alt="Pkg.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../">Pkg.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../"><strong>1.</strong> 简介</a></li><li><a class="tocitem" href="../getting-started/"><strong>2.</strong> 入门</a></li><li><a class="tocitem" href="../managing-packages/"><strong>3.</strong> 管理包</a></li><li><a class="tocitem" href="../environments/"><strong>4.</strong> 使用“环境”</a></li><li class="is-active"><a class="tocitem" href><strong>5.</strong> 创建包</a><ul class="internal"><li><a class="tocitem" href="#为包生成文件"><span>为包生成文件</span></a></li><li><a class="tocitem" href="#将依赖项添加到项目中"><span>将依赖项添加到项目中</span></a></li><li><a class="tocitem" href="#向包中添加构建步骤"><span>向包中添加构建步骤</span></a></li><li><a class="tocitem" href="#向包中添加测试"><span>向包中添加测试</span></a></li><li><a class="tocitem" href="#依赖的兼容性"><span>依赖的兼容性</span></a></li><li><a class="tocitem" href="#Package-naming-guidelines"><span>包命名准则</span></a></li><li><a class="tocitem" href="#注册包"><span>注册包</span></a></li><li><a class="tocitem" href="#最佳实践"><span>最佳实践</span></a></li></ul></li><li><a class="tocitem" href="../compatibility/"><strong>6.</strong> 兼容性</a></li><li><a class="tocitem" href="../registries/"><strong>7.</strong> 注册表</a></li><li><a class="tocitem" href="../artifacts/"><strong>8.</strong> Artifacts</a></li><li><a class="tocitem" href="../glossary/"><strong>9.</strong> 词汇表</a></li><li><a class="tocitem" href="../toml-files/"><strong>10.</strong> <code>Project.toml</code> and <code>Manifest.toml</code></a></li><li><a class="tocitem" href="../repl/"><strong>11.</strong> REPL Mode Reference</a></li><li><a class="tocitem" href="../api/"><strong>12.</strong> API Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href><strong>5.</strong> 创建包</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href><strong>5.</strong> 创建包</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/ioxera/Pkg.jl/blob/master/docs/src/creating-packages.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="**5.**-创建包"><a class="docs-heading-anchor" href="#**5.**-创建包"><strong>5.</strong> 创建包</a><a id="**5.**-创建包-1"></a><a class="docs-heading-anchor-permalink" href="#**5.**-创建包" title="Permalink"></a></h1><h2 id="为包生成文件"><a class="docs-heading-anchor" href="#为包生成文件">为包生成文件</a><a id="为包生成文件-1"></a><a class="docs-heading-anchor-permalink" href="#为包生成文件" title="Permalink"></a></h2><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p><a href="https://github.com/invenia/PkgTemplates.jl">PkgTemplates</a>包提供了一种简单、可重复和可定制的方式来为新包生成文件。它还可以生成文档、CI 等所需的文件。我们建议您使用 PkgTemplates 来创建新包，而不是使用下面描述的最小 <code>pkg&gt; generate</code> 功能。</p></div></div><p>要为新包生成最少的文件，请使用 <code>pkg&gt; generate</code>.</p><pre><code class="language-julia-repl hljs">(@v1.8) pkg&gt; generate HelloWorld</code></pre><p>这将创建一个包含以下文件的新项目 <code>HelloWorld</code>（使用外部 <a href="https://linux.die.net/man/1/tree"><code>tree</code> command</a> 命令可视化）：</p><pre><code class="language-julia-repl hljs">julia&gt; cd(&quot;HelloWorld&quot;)
+
+shell&gt; tree .
+.
+├── Project.toml
+└── src
+    └── HelloWorld.jl
+
+1 directory, 2 files</code></pre><p><code>Project.toml</code> 文件包含包名、唯一的 UUID、版本、作者和潜在的依赖项：</p><pre><code class="language-toml hljs">name = &quot;HelloWorld&quot;
+uuid = &quot;b4cd1eb8-1e24-11e8-3319-93036a3eb9f3&quot;
+version = &quot;0.1.0&quot;
+authors = [&quot;Some One &lt;someone@email.com&gt;&quot;]
+
+[deps]</code></pre><p><code>src/HelloWorld.jl</code> 的内容是:</p><pre><code class="language-julia hljs">module HelloWorld
+
+greet() = print(&quot;Hello World!&quot;)
+
+end # module</code></pre><p>我们现在可以激活项目并加载包：</p><pre><code class="language-julia-repl hljs">pkg&gt; activate .
+
+julia&gt; import HelloWorld
+
+julia&gt; HelloWorld.greet()
+Hello World!</code></pre><h2 id="将依赖项添加到项目中"><a class="docs-heading-anchor" href="#将依赖项添加到项目中">将依赖项添加到项目中</a><a id="将依赖项添加到项目中-1"></a><a class="docs-heading-anchor-permalink" href="#将依赖项添加到项目中" title="Permalink"></a></h2><p>假设我们要在我们的项目中使用标准库包 <code>Random</code> 及已注册包 <code>JSON</code>。我们只 <code>add</code> 这些包（注意提示符现在如何显示新生成的项目的名称，因为我们已经 <code>activated</code> 了它）：</p><pre><code class="language-julia-repl hljs">(HelloWorld) pkg&gt; add Random JSON
+   Resolving package versions...
+    Updating `~/HelloWorld/Project.toml`
+  [682c06a0] + JSON v0.21.3
+  [9a3f8284] + Random
+    Updating `~/HelloWorld/Manifest.toml`
+  [682c06a0] + JSON v0.21.3
+  [69de0a69] + Parsers v2.4.0
+  [ade2ca70] + Dates
+ ...</code></pre><p><code>Random</code> 和 <code>JSON</code>都被添加到项目的 <code>Project.toml</code> 文件中，并且生成的依赖项被添加到 <code>Manifest.toml</code> 文件中。解析器已经尽可能安装了每个包的高版本，同时仍然尊重每个包对其依赖项强制执行的兼容性。</p><p>现在可以在我们的项目中使用 <code>Random</code> 和 <code>JSON</code>。修改 <code>src/HelloWorld.jl</code> 为：</p><pre><code class="language-julia hljs">module HelloWorld
+
+import Random
+import JSON
+
+greet() = print(&quot;Hello World!&quot;)
+greet_alien() = print(&quot;Hello &quot;, Random.randstring(8))
+
+end # module</code></pre><p>重新加载包，使用 <code>Random</code> 的新函数 <code>greet_alien</code> 可以被调用：</p><pre><code class="language-julia-repl hljs">julia&gt; HelloWorld.greet_alien()
+Hello aT157rHV</code></pre><h2 id="向包中添加构建步骤"><a class="docs-heading-anchor" href="#向包中添加构建步骤">向包中添加构建步骤</a><a id="向包中添加构建步骤-1"></a><a class="docs-heading-anchor-permalink" href="#向包中添加构建步骤" title="Permalink"></a></h2><p>构建步骤在首次安装包或使用 <code>build</code> 时执行，通过执行文件 <code>deps/build.jl</code> 构建一个包。</p><pre><code class="language-julia-repl hljs">julia&gt; print(read(&quot;deps/build.jl&quot;, String))
+println(&quot;I am being built...&quot;)
+
+(HelloWorld) pkg&gt; build
+  Building HelloWorld → `deps/build.log`
+ Resolving package versions...
+
+julia&gt; print(read(&quot;deps/build.log&quot;, String))
+I am being built...</code></pre><p>如果构建步骤失败，则将构建步骤的输出打印到控制台</p><pre><code class="language-julia-repl hljs">julia&gt; print(read(&quot;deps/build.jl&quot;, String))
+error(&quot;Ooops&quot;)
+
+(HelloWorld) pkg&gt; build
+    Building HelloWorld → `~/HelloWorld/deps/build.log`
+ERROR: Error building `HelloWorld`:
+ERROR: LoadError: Ooops
+Stacktrace:
+ [1] error(s::String)
+   @ Base ./error.jl:35
+ [2] top-level scope
+   @ ~/HelloWorld/deps/build.jl:1
+ [3] include(fname::String)
+   @ Base.MainInclude ./client.jl:476
+ [4] top-level scope
+   @ none:5
+in expression starting at /home/kc/HelloWorld/deps/build.jl:1</code></pre><div class="admonition is-warning"><header class="admonition-header">Warning</header><div class="admonition-body"><p>构建步骤通常不应在包目录中创建或修改任何文件。如果您需要存储构建步骤中的一些文件，请使用 <a href="https://github.com/JuliaPackaging/Scratch.jl">Scratch.jl</a> 包。</p></div></div><h2 id="向包中添加测试"><a class="docs-heading-anchor" href="#向包中添加测试">向包中添加测试</a><a id="向包中添加测试-1"></a><a class="docs-heading-anchor-permalink" href="#向包中添加测试" title="Permalink"></a></h2><p>当一个包被测试时，文件 <code>test/runtests.jl</code> 被执行：</p><pre><code class="language-julia-repl hljs">julia&gt; print(read(&quot;test/runtests.jl&quot;, String))
+println(&quot;Testing...&quot;)
+
+(HelloWorld) pkg&gt; test
+   Testing HelloWorld
+ Resolving package versions...
+Testing...
+   Testing HelloWorld tests passed</code></pre><p>测试在一个新的 Julia 进程中运行，其中包本身以及任何特定于测试的依赖项都可用，见下文。</p><div class="admonition is-warning"><header class="admonition-header">Warning</header><div class="admonition-body"><p>测试通常不应在包目录中创建或修改任何文件。如果您需要存储构建步骤中的一些文件，请使用<a href="https://github.com/JuliaPackaging/Scratch.jl">Scratch.jl</a>包。</p></div></div><h3 id="特定于测试的依赖项"><a class="docs-heading-anchor" href="#特定于测试的依赖项">特定于测试的依赖项</a><a id="特定于测试的依赖项-1"></a><a class="docs-heading-anchor-permalink" href="#特定于测试的依赖项" title="Permalink"></a></h3><p>有两种方法可以添加特定于测试的依赖项（依赖项不是包的依赖项，但在测试包时仍然可以加载）。</p><h4 id="基于-target-测试特定依赖项"><a class="docs-heading-anchor" href="#基于-target-测试特定依赖项">基于 <code>target</code> 测试特定依赖项</a><a id="基于-target-测试特定依赖项-1"></a><a class="docs-heading-anchor-permalink" href="#基于-target-测试特定依赖项" title="Permalink"></a></h4><p>使用此方法添加特定于测试的依赖项，将包添加到 <code>[extras]</code> 节下并添加到测试目标，例如要添加 <code>Markdown</code> 和 <code>Test</code> 作为测试依赖项，添加以下内容到Project.toml文件。</p><pre><code class="language-toml hljs">[extras]
+Markdown = &quot;d6f4376e-aef5-505a-96c1-9c027394607a&quot;
+Test = &quot;8dfed614-e22c-5e08-85e1-65c5234f0b40&quot;
+
+[targets]
+test = [&quot;Markdown&quot;, &quot;Test&quot;]</code></pre><p>此例中除了 <code>test</code> 之外，没有其他“targets” 。</p><h4 id="test/Project.toml-文件测试特定依赖项"><a class="docs-heading-anchor" href="#test/Project.toml-文件测试特定依赖项"><code>test/Project.toml</code> 文件测试特定依赖项</a><a id="test/Project.toml-文件测试特定依赖项-1"></a><a class="docs-heading-anchor-permalink" href="#test/Project.toml-文件测试特定依赖项" title="Permalink"></a></h4><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p><code>Project.toml</code>，<code>test/Project.toml</code> 以及它们对应的 <code>Manifest.toml</code> 之间的确切交互尚未完全确定，并且在未来的版本中可能会发生变化。因此，所有 Julia 1.X 版本都支持添加特定于测试的依赖项的旧方法，将在下一节中介绍。</p></div></div><p>由于是由 <code>test/Project.toml</code> 给出的，因此，在运行测试时，这将会成为活动项目，并且只能使用依赖于 <code>test/Project.toml</code> 的项目。请注意，Pkg 将隐式添加测试包本身。</p><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>如果 <code>test/Project.toml</code> 不存在, Pkg 将使用基于<code>target</code>测试特定依赖项。</p></div></div><p>要添加特定于测试的依赖项（即仅在测试时可用的依赖项），只需将此依赖项添加到 <code>test/Project.toml</code> 项目中就足够了。可以通过从 Pkg REPL 中激活此环境，然后像平时一样使用 <code>add</code> 添加依赖。让我们添加 <code>Test</code> 标准库作为测试依赖项：</p><pre><code class="language-julia-repl hljs">(HelloWorld) pkg&gt; activate ./test
+[ Info: activating environment at `~/HelloWorld/test/Project.toml`.
+
+(test) pkg&gt; add Test
+ Resolving package versions...
+  Updating `~/HelloWorld/test/Project.toml`
+  [8dfed614] + Test
+  Updating `~/HelloWorld/test/Manifest.toml`
+  [...]</code></pre><p>现在可以在测试脚本中使用 <code>Test</code> ，可以看到它在测试时被安装：</p><pre><code class="language-julia-repl hljs">julia&gt; print(read(&quot;test/runtests.jl&quot;, String))
+using Test
+@test 1 == 1
+
+(HelloWorld) pkg&gt; test
+   Testing HelloWorld
+ Resolving package versions...
+  Updating `/var/folders/64/76tk_g152sg6c6t0b4nkn1vw0000gn/T/tmpPzUPPw/Project.toml`
+  [d8327f2a] + HelloWorld v0.1.0 [`~/.julia/dev/Pkg/HelloWorld`]
+  [8dfed614] + Test
+  Updating `/var/folders/64/76tk_g152sg6c6t0b4nkn1vw0000gn/T/tmpPzUPPw/Manifest.toml`
+  [d8327f2a] + HelloWorld v0.1.0 [`~/.julia/dev/Pkg/HelloWorld`]
+   Testing HelloWorld tests passed```</code></pre><h2 id="依赖的兼容性"><a class="docs-heading-anchor" href="#依赖的兼容性">依赖的兼容性</a><a id="依赖的兼容性-1"></a><a class="docs-heading-anchor-permalink" href="#依赖的兼容性" title="Permalink"></a></h2><p>一般来说，每个依赖项都应该有一个兼容性约束。这是一个重要的话题，所以有一个单独的章节：<a href="../compatibility/#Compatibility">兼容性</a>。</p><h2 id="Package-naming-guidelines"><a class="docs-heading-anchor" href="#Package-naming-guidelines">包命名准则</a><a id="Package-naming-guidelines-1"></a><a class="docs-heading-anchor-permalink" href="#Package-naming-guidelines" title="Permalink"></a></h2><p>对于大多数 Julia 用户来说，包名应该是切合实际的，<em>即使对于那些不是领域专家的人来说也是如此</em>。以下指南适用于 <code>General</code> 注册表，但也可能对其他包注册表有用。</p><p>由于 <code>General</code> 注册表属于整个社区，所以当你发布包时，人们可能会对你的包名有意见，特别是如果它不明确或可能与其他东西混淆时。通常，您会得到一个可能更适合您的包的新名称的建议。</p><ol><li>避免行话。特别是要避免使用首字母缩略词，除非混淆的可能性很小。</li></ol><ul><li>如果您在谈论美国，可以使用 <code>USA</code>。</li><li>即使您在谈论积极的心态，也不能使用 <code>PMA</code>。</li></ul><ol><li>避免在你的包名中使用 <code>Julia</code> 或在它前面加上 <code>Ju</code>。</li></ol><ul><li>您的用户通常可以从上下文中清楚地知道该包是 Julia 包。</li><li>包名称已经有一个 <code>.jl</code> 扩展，它向用户表明了 <code>Package.jl</code> 是个Julia 包。</li><li>名称中包含 Julia 可能意味着该包与 Julia 语言本身的贡献者相关或由其认可。</li></ul><ol><li>提供与新类型相关的大部分功能的包应该具有英文单词复数形式的名称。</li></ol><ul><li><code>DataFrames</code> 提供 <code>DataFrame</code> 类型。</li><li><code>BloomFilters</code> 提供 <code>BloomFilter</code> 类型。</li><li>相比之下，<code>JuliaParser</code> 不提供新类型，而是在函数 <code>JuliaParser.parse()</code> 中提供新功能。</li></ul><ol><li>在清晰的表达方面犯错，因为清晰的表达在你看来可能更冗长。</li></ol><ul><li><code>RandomMatrices</code> 是一个比 <code>RndMator</code> 或 <code>RMT</code>更明确的名称 ，即使后者更短。</li></ul><ol><li>不太系统的名称可能适合实现其领域内的几种可能方法之一的包。</li></ol><ul><li>Julia 没有单一的综合绘图包。相反，<code>Gadfly</code>、<code>PyPlot</code>、<code>Winston</code> 和其他包都实现了基于特定设计理念的独特方法。</li><li>相反，<code>SortingAlgorithms</code> 提供了一个一致的接口来使用许多成熟的排序算法。</li></ul><ol><li>包装外部库或程序的包应以这些库或程序命名。</li></ol><ul><li><code>CPLEX.jl</code> 包装了 <code>CPLEX</code> 库, 它可以在 web 搜索中轻松识别。</li><li><code>MATLAB.jl</code> 提供从 Julia 内部调用 MATLAB 引擎的接口。</li></ul><ol><li>避免与现有包相似的名称<ul><li><code>Websocket</code> 和 <code>WebSockets</code> 太相似，容易被用户混淆。 应该使用新名称，例如 <code>SimpleWebsockets</code>。</li></ul></li></ol><h2 id="注册包"><a class="docs-heading-anchor" href="#注册包">注册包</a><a id="注册包-1"></a><a class="docs-heading-anchor-permalink" href="#注册包" title="Permalink"></a></h2><p>一旦一个包准备好了，它就可以在<a href="https://github.com/JuliaRegistries/General#registering-a-package-in-general">General Registry</a>注册表中注册（另请参阅<a href="https://github.com/JuliaRegistries/General#faq">FAQ</a>）。目前，包是通过<a href="https://juliaregistrator.github.io/"><code>Registrator</code></a>提交的。 此外 <code>Registrator</code>，<a href="https://github.com/marketplace/actions/julia-tagbot"><code>TagBot</code></a>帮助管理标记发布的过程。</p><h2 id="最佳实践"><a class="docs-heading-anchor" href="#最佳实践">最佳实践</a><a id="最佳实践-1"></a><a class="docs-heading-anchor-permalink" href="#最佳实践" title="Permalink"></a></h2><p>包应该避免改变自己的状态（写入包目录中的文件）。一般来说，包不应该假设它们位于可写位置（例如，作为系统级 depot 的一部分安装）甚至是稳定的位置（例如，它们通过<a href="https://github.com/JuliaLang/PackageCompiler.jl">PackageCompiler.jl</a>捆绑到系统映像中）。为了支持 Julia 包生态系统中的各种用例，Pkg 开发人员创建了许多辅助包和技术来帮助包作者创建自包含、不可变和可重定位的包：</p><ul><li><p><a href="https://pkgdocs.julialang.org/v1/artifacts/"><code>Artifacts</code></a>可用于将数据块与您的包捆绑在一起，甚至允许它们按需下载。相比尝试通过诸如 <code>joinpath(@__DIR__, &quot;data&quot;, &quot;my_dataset.csv&quot;)</code> 不可重定位的路径打开文件，artifacts 更优雅。一旦你的包被预编译，<code>@__DIR__</code>的结果将被自动加入到你的预编译包数据中，如果你尝试分发这个包，它会尝试在错误的位置加载文件。可以使用 <code>artifact&quot;name&quot;</code> 字符串宏轻松绑定和访问 Artifacts。</p></li><li><p><a href="https://github.com/JuliaPackaging/Scratch.jl"><code>Scratch.jl</code></a>提供“暂存空间”的概念，即包的可变数据容器。暂存空间专为完全由包管理的数据缓存而设计，在卸载包时应将其删除。对于重要的用户生成的数据，包应继续写入到用户指定的路径，该路径不受 Julia 或 Pkg 管理。</p></li><li><p><a href="https://github.com/JuliaPackaging/Preferences.jl"><code>Preferences.jl</code></a>允许包读写选项偏好(preferences)到顶级 <code>Project.toml</code>. 这些选项偏好可以在运行时或编译时读取，以启用或禁用包行为的不同方面。以前，包会将文件写入自己的包目录以记录用户或环境设置的选项，但现在非常不鼓励这样做，使用 <code>Preferences</code> 可以做的更好。</p></li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../environments/">« <strong>4.</strong> 使用“环境”</a><a class="docs-footer-nextpage" href="../compatibility/"><strong>6.</strong> 兼容性 »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Thursday 10 November 2022 02:44">Thursday 10 November 2022</span>. Using Julia version 1.9.0-DEV.1786.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

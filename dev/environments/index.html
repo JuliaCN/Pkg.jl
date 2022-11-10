@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>4. 使用“环境” · Pkg.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link rel="canonical" href="https://julialang.github.io/Pkg.jl/v1/environments/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/custom.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.png" alt="Pkg.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../">Pkg.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../"><strong>1.</strong> 简介</a></li><li><a class="tocitem" href="../getting-started/"><strong>2.</strong> 入门</a></li><li><a class="tocitem" href="../managing-packages/"><strong>3.</strong> 管理包</a></li><li class="is-active"><a class="tocitem" href><strong>4.</strong> 使用“环境”</a><ul class="internal"><li><a class="tocitem" href="#创建自己的环境"><span>创建自己的环境</span></a></li><li><a class="tocitem" href="#使用别人的项目"><span>使用别人的项目</span></a></li><li><a class="tocitem" href="#临时环境"><span>临时环境</span></a></li><li><a class="tocitem" href="#共享环境"><span>共享环境</span></a></li><li><a class="tocitem" href="#环境预编译"><span>环境预编译</span></a></li></ul></li><li><a class="tocitem" href="../creating-packages/"><strong>5.</strong> 创建包</a></li><li><a class="tocitem" href="../compatibility/"><strong>6.</strong> 兼容性</a></li><li><a class="tocitem" href="../registries/"><strong>7.</strong> 注册表</a></li><li><a class="tocitem" href="../artifacts/"><strong>8.</strong> Artifacts</a></li><li><a class="tocitem" href="../glossary/"><strong>9.</strong> 词汇表</a></li><li><a class="tocitem" href="../toml-files/"><strong>10.</strong> <code>Project.toml</code> and <code>Manifest.toml</code></a></li><li><a class="tocitem" href="../repl/"><strong>11.</strong> REPL Mode Reference</a></li><li><a class="tocitem" href="../api/"><strong>12.</strong> API Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href><strong>4.</strong> 使用“环境”</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href><strong>4.</strong> 使用“环境”</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/ioxera/Pkg.jl/blob/master/docs/src/environments.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Working-with-Environments"><a class="docs-heading-anchor" href="#Working-with-Environments"><strong>4.</strong> 使用“环境”</a><a id="Working-with-Environments-1"></a><a class="docs-heading-anchor-permalink" href="#Working-with-Environments" title="Permalink"></a></h1><p>下面讨论 Pkg 与环境的交互。有关环境在代码加载中扮演的角色的更多信息，包括可以从中加载代码的环境的“栈”，请参阅<a href="https://docs.julialang.org/en/v1/manual/code-loading/#Environments-1">Julia 手册中的此部分</a>。</p><h2 id="创建自己的环境"><a class="docs-heading-anchor" href="#创建自己的环境">创建自己的环境</a><a id="创建自己的环境-1"></a><a class="docs-heading-anchor-permalink" href="#创建自己的环境" title="Permalink"></a></h2><p>到目前为止，我们已经将包添加到默认环境中 <code>~/.julia/environments/v1.8</code>。然而，创建另外的独立项目很容易。这种方法的好处是允许您在代码旁边创建 <code>Project.toml</code> 及 <code>Manifest.toml</code> 文件，并添加进版本控制（例如 git）中。需要指出的是，当两个项目使用相同版本的同一个包时，这个包的内容只保存一份。为新项目创建一个目录，然后激活该目录以使其成为“活动项目”，操作如下：</p><pre><code class="language-julia-repl hljs">(@v1.8) pkg&gt; activate MyProject
+Activating new environment at `~/MyProject/Project.toml`
+
+(MyProject) pkg&gt; st
+    Status `~/MyProject/Project.toml` (empty project)</code></pre><p>请注意，激活新项目时，REPL 提示会发生变化。在添加包之前，此环境中没有文件，甚至可能不会创建环境目录：</p><pre><code class="language-julia-repl hljs">julia&gt; isdir(&quot;MyProject&quot;)
+false
+
+(MyProject) pkg&gt; add Example
+   Resolving package versions...
+   Installed Example ─ v0.5.3
+    Updating `~/MyProject/Project.toml`
+  [7876af07] + Example v0.5.3
+    Updating `~~/MyProject/Manifest.toml`
+  [7876af07] + Example v0.5.3
+Precompiling environment...
+  1 dependency successfully precompiled in 2 seconds
+
+julia&gt; readdir(&quot;MyProject&quot;)
+2-element Vector{String}:
+ &quot;Manifest.toml&quot;
+ &quot;Project.toml&quot;
+
+julia&gt; print(read(joinpath(&quot;MyProject&quot;, &quot;Project.toml&quot;), String))
+[deps]
+Example = &quot;7876af07-990d-54b4-ab0e-23690620f79a&quot;
+
+julia&gt; print(read(joinpath(&quot;MyProject&quot;, &quot;Manifest.toml&quot;), String))
+# This file is machine-generated - editing it directly is not advised
+
+julia_version = &quot;1.8.2&quot;
+manifest_format = &quot;2.0&quot;
+project_hash = &quot;2ca1c6c58cb30e79e021fb54e5626c96d05d5fdc&quot;
+
+[[deps.Example]]
+git-tree-sha1 = &quot;46e44e869b4d90b96bd8ed1fdcf32244fddfb6cc&quot;
+uuid = &quot;7876af07-990d-54b4-ab0e-23690620f79a&quot;
+version = &quot;0.5.3&quot;</code></pre><p>新环境与我们之前使用的环境完全不同。有关更详细的说明，请参阅 <a href="../toml-files/#Project-and-Manifest"><code>Project.toml</code> 和 <code>Manifest.toml</code></a>。</p><h2 id="使用别人的项目"><a class="docs-heading-anchor" href="#使用别人的项目">使用别人的项目</a><a id="使用别人的项目-1"></a><a class="docs-heading-anchor-permalink" href="#使用别人的项目" title="Permalink"></a></h2><p>只需使用 <code>git clone</code> 克隆别人的项目， 然后 <code>cd</code> 到项目目录并调用：</p><pre><code class="language-julia-repl hljs">shell&gt; git clone https://github.com/JuliaLang/Example.jl.git
+Cloning into &#39;Example.jl&#39;...
+...
+
+(@v1.8) pkg&gt; activate Example.jl
+Activating project at `~/Example.jl`
+
+(Example) pkg&gt; instantiate
+  No Changes to `~/Example.jl/Project.toml`
+  No Changes to `~/Example.jl/Manifest.toml`</code></pre><p>如果项目包含 manifest，这将以该 manifest 给出的相同状态安装包。否则，它将解析与项目兼容的最新版本的依赖项。</p><p>请注意，<code>activate</code> 本身不会安装缺少的依赖项。如果您只有一个 <code>Project.toml</code> 文件， 则 <code>Manifest.toml</code> 必须通过“解析”环境来生成，任何丢失的包都必须安装并预编译。<code>instantiate</code> 命令为你做了这些工作。</p><p>如果您已经有一个已解析的 <code>Manifest.toml</code>，那您仍然需要确保所有软件包及其正确版本都已安装。 <code>instantiate</code> 再次为您执行这些操作。</p><p>简而言之，<code>instantiate</code> 确保环境已经准备好可以使用。如果什么也不用做，那么 <code>instantiate</code> 什么也不做。</p><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>您可以使用 <code>--project=&lt;path&gt;</code> 参数在启动时指定项目，替代在 Julia 中使用 <code>activate</code>。例如，要使用当前目录中的环境从命令行运行脚本，您可以运行 </p><pre><code class="language-bash hljs">$ julia --project=. myscript.jl</code></pre></div></div><h2 id="临时环境"><a class="docs-heading-anchor" href="#临时环境">临时环境</a><a id="临时环境-1"></a><a class="docs-heading-anchor-permalink" href="#临时环境" title="Permalink"></a></h2><p>临时环境可以轻松地从空白环境开始以测试一个包或一组包，并让 Pkg 在您测试完后自动删除环境。例如，在编写错误报告时，您可能希望在一个“干净”环境中测试您的最小复现示例，以保证它确实是可复现的。您可能还需要一个临时空间来试用一个新包，或者一个沙箱来解决几个不兼容的包之间的版本冲突。</p><pre><code class="language-julia-repl hljs">(@v1.8) pkg&gt; activate --temp # requires Julia 1.5 or later
+  Activating new environment at `/var/folders/34/km3mmt5930gc4pzq1d08jvjw0000gn/T/jl_a31egx/Project.toml`
+
+(jl_a31egx) pkg&gt; add Example
+    Updating registry at `~/.julia/registries/General`
+   Resolving package versions...
+    Updating `/private/var/folders/34/km3mmt5930gc4pzq1d08jvjw0000gn/T/jl_a31egx/Project.toml`
+  [7876af07] + Example v0.5.3
+    Updating `/private/var/folders/34/km3mmt5930gc4pzq1d08jvjw0000gn/T/jl_a31egx/Manifest.toml`
+  [7876af07] + Example v0.5.3</code></pre><h2 id="共享环境"><a class="docs-heading-anchor" href="#共享环境">共享环境</a><a id="共享环境-1"></a><a class="docs-heading-anchor-permalink" href="#共享环境" title="Permalink"></a></h2><p>“共享”环境是存在于 <code>~/.julia/environments</code> 的简单环境，因此，默认的 <code>v1.8</code> 环境是共享环境：</p><pre><code class="language-julia-repl hljs">(@v1.8) pkg&gt; st
+Status `~/.julia/environments/v1.8/Project.toml`</code></pre><p>可以使用 <code>activate</code> 命令的 <code>--shared</code> 参数激活共享环境 ：</p><pre><code class="language-julia-repl hljs">(@v1.8) pkg&gt; activate --shared mysharedenv
+  Activating project at `~/.julia/environments/mysharedenv`
+
+(@mysharedenv) pkg&gt;</code></pre><p>共享环境在 Pkg REPL 提示符中的名称前有一个 <code>@</code>。</p><h2 id="环境预编译"><a class="docs-heading-anchor" href="#环境预编译">环境预编译</a><a id="环境预编译-1"></a><a class="docs-heading-anchor-permalink" href="#环境预编译" title="Permalink"></a></h2><p>在导入包之前，Julia 会将源代码“预编译”到磁盘上更高效的中间缓存中。如果未导入的包是新的或自上次缓存以来已发生更改，则可以通过“代码加载”触发此预编译。</p><pre><code class="language-julia-repl hljs">julia&gt; using Example
+[ Info: Precompiling Example [7876af07-990d-54b4-ab0e-23690620f79a]</code></pre><p>或者使用 Pkg 的预编译选项，它可以并行预编译整个环境或给定的依赖项，这比上面的代码加载方式快得多。</p><pre><code class="language-julia-repl hljs">(@v1.8) pkg&gt; precompile
+Precompiling environment...
+  23 dependencies successfully precompiled in 36 seconds</code></pre><p>然而，由于 Pkg 的自动预编译机制，以上两种方式通常是不需要的。</p><h3 id="自动预编译"><a class="docs-heading-anchor" href="#自动预编译">自动预编译</a><a id="自动预编译-1"></a><a class="docs-heading-anchor-permalink" href="#自动预编译" title="Permalink"></a></h3><p>默认情况下，任何添加到项目或在 Pkg 操作中更新的包以及它的依赖项都将自动预编译。</p><pre><code class="language-julia-repl hljs">(@v1.8) pkg&gt; add Images
+   Resolving package versions...
+    Updating `~/.julia/environments/v1.9/Project.toml`
+  [916415d5] + Images v0.25.2
+    Updating `~/.julia/environments/v1.9/Manifest.toml`
+    ...
+Precompiling environment...
+  Progress [===================&gt;                     ]  45/97
+  ✓ NaNMath
+  ✓ IntervalSets
+  ◐ CoordinateTransformations
+  ◑ ArnoldiMethod
+  ◑ IntegralArrays
+  ◒ RegionTrees
+  ◐ ChangesOfVariables
+  ◓ PaddedViews</code></pre><p><code>develop</code> 命令是个例外，它既不构建也不预编译包。何时预编译由用户决定。</p><p>如果在自动预编译期间给定的包版本出错，Pkg 会记住它，下面的自动尝试都会跳过该包并发出简短的警告。手动预编译可用于强制重试这些包，因为 <code>pkg&gt; precompile</code> 将始终重试所有包。</p><p>要禁用自动预编译，请设置 <code>ENV[&quot;JULIA_PKG_PRECOMPILE_AUTO&quot;]=0</code>.</p><h3 id="预编译已加载包的新版本"><a class="docs-heading-anchor" href="#预编译已加载包的新版本">预编译已加载包的新版本</a><a id="预编译已加载包的新版本-1"></a><a class="docs-heading-anchor-permalink" href="#预编译已加载包的新版本" title="Permalink"></a></h3><p>如果会话中已经加载了已更新的包，则预编译过程将继续并预编译新版本以及任何依赖它的包，但需注意该包在会话重新启动之前无法使用。</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../managing-packages/">« <strong>3.</strong> 管理包</a><a class="docs-footer-nextpage" href="../creating-packages/"><strong>5.</strong> 创建包 »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Thursday 10 November 2022 02:44">Thursday 10 November 2022</span>. Using Julia version 1.9.0-DEV.1786.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

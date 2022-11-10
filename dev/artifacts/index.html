@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>8. Artifacts · Pkg.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link rel="canonical" href="https://julialang.github.io/Pkg.jl/v1/artifacts/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/custom.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.png" alt="Pkg.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../">Pkg.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../"><strong>1.</strong> 简介</a></li><li><a class="tocitem" href="../getting-started/"><strong>2.</strong> 入门</a></li><li><a class="tocitem" href="../managing-packages/"><strong>3.</strong> 管理包</a></li><li><a class="tocitem" href="../environments/"><strong>4.</strong> 使用“环境”</a></li><li><a class="tocitem" href="../creating-packages/"><strong>5.</strong> 创建包</a></li><li><a class="tocitem" href="../compatibility/"><strong>6.</strong> 兼容性</a></li><li><a class="tocitem" href="../registries/"><strong>7.</strong> 注册表</a></li><li class="is-active"><a class="tocitem" href><strong>8.</strong> Artifacts</a><ul class="internal"><li><a class="tocitem" href="#基本用法"><span>基本用法</span></a></li><li><a class="tocitem" href="#Artifacts.toml-文件"><span><code>Artifacts.toml</code> 文件</span></a></li><li><a class="tocitem" href="#Artifact-类型和属性"><span>Artifact 类型和属性</span></a></li><li><a class="tocitem" href="#使用-Artifacts"><span>使用 Artifacts</span></a></li><li><a class="tocitem" href="#Pkg.Artifacts-API"><span><code>Pkg.Artifacts</code> API</span></a></li><li><a class="tocitem" href="#覆盖-artifact-位置"><span>覆盖 artifact 位置</span></a></li><li><a class="tocitem" href="#扩展平台选择"><span>扩展平台选择</span></a></li></ul></li><li><a class="tocitem" href="../glossary/"><strong>9.</strong> 词汇表</a></li><li><a class="tocitem" href="../toml-files/"><strong>10.</strong> <code>Project.toml</code> and <code>Manifest.toml</code></a></li><li><a class="tocitem" href="../repl/"><strong>11.</strong> REPL Mode Reference</a></li><li><a class="tocitem" href="../api/"><strong>12.</strong> API Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href><strong>8.</strong> Artifacts</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href><strong>8.</strong> Artifacts</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/ioxera/Pkg.jl/blob/master/docs/src/artifacts.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Artifacts"><a class="docs-heading-anchor" href="#Artifacts"><strong>8.</strong> Artifacts</a><a id="Artifacts-1"></a><a class="docs-heading-anchor-permalink" href="#Artifacts" title="Permalink"></a></h1><p><code>Pkg</code> 可以安装和管理数据容器，它不是 Julia 包。这些容器可以包含特定于平台的二进制文件、数据集、文本或任何其他类型的数据，这些数据可以方便地放置在不可变的、具有生命周期的数据存储中。这些容器（称为“Artifacts”）可以在本地创建、托管在任何地方，并在安装 Julia 包时自动下载和解包。此机制还为使用<a href="https://github.com/JuliaPackaging/BinaryBuilder.jl"><code>BinaryBuilder.jl</code></a> 进行包构建提供二进制依赖。</p><h2 id="基本用法"><a class="docs-heading-anchor" href="#基本用法">基本用法</a><a id="基本用法-1"></a><a class="docs-heading-anchor-permalink" href="#基本用法" title="Permalink"></a></h2><p><code>Pkg</code> artifacts 在Artifacts.toml文件中声明，该文件可以放在当前目录或包的根目录中。目前，<code>Pkg</code> 支持从 URL 下载 tar 文件（可以压缩）。以下是一个最小 <code>Artifacts.toml</code> 文件，它允许从 <code>github.com</code> 下载 <code>socrates.tar.gz</code> 文件。在此示例中，定义了一个名为 <code>socrates</code> 的 artifact。</p><pre><code class="language-TOML hljs"># a simple Artifacts.toml file
+[socrates]
+git-tree-sha1 = &quot;43563e7631a7eafae1f9f8d9d332e3de44ad7239&quot;
+
+    [[socrates.download]]
+    url = &quot;https://github.com/staticfloat/small_bin/raw/master/socrates.tar.gz&quot;
+    sha256 = &quot;e65d2f13f2085f2c279830e863292312a72930fee5ba3c792b14c33ce5c5cc58&quot;</code></pre><p>如果 <code>Artifacts.toml</code> 文件位于您的当前目录中，则 <code>socrates.tar.gz</code> 可以下载、解压缩，并以 <code>artifact&quot;socrates&quot;</code> 方式使用。由于这个 tar 压缩包包含一个 <code>bin</code> 文件夹和一个名为 <code>socrates</code> 的文本文件，我们可以按如下方式访问该文件的内容。</p><pre><code class="language-julia hljs">using Pkg.Artifacts
+
+rootpath = artifact&quot;socrates&quot;
+open(joinpath(rootpath, &quot;bin&quot;, &quot;socrates&quot;)) do file
+    println(read(file, String))
+end</code></pre><p>如果您有一个可通过 <code>url</code> 访问的现有 tar 压缩包，也可以以这种方式访问​​它。要创建 <code>Artifacts.toml</code> 您必须计算两个哈希值：下载文件的 <code>sha256</code> 哈希值和解压内容的 <code>git-tree-sha1</code> 哈希值。这些可以计算如下：</p><pre><code class="language-julia hljs">using Tar, Inflate, SHA
+
+filename = &quot;socrates.tar.gz&quot;
+println(&quot;sha256: &quot;, bytes2hex(open(sha256, filename)))
+println(&quot;git-tree-sha1: &quot;, Tar.tree_hash(IOBuffer(inflate_gzip(filename))))</code></pre><p>要从您创建的包中访问此 artifact，请将 <code>Artifacts.toml</code> 放在包的根目录中，和 <code>Project.toml</code> 相邻。然后，确保在您的 <code>deps</code> 节中添加了 <code>Pkg</code>，以及在 <code>compat</code> 节中设置 <code>julia = &quot;1.3&quot;</code> 或更高版本。</p><h2 id="Artifacts.toml-文件"><a class="docs-heading-anchor" href="#Artifacts.toml-文件"><code>Artifacts.toml</code> 文件</a><a id="Artifacts.toml-文件-1"></a><a class="docs-heading-anchor-permalink" href="#Artifacts.toml-文件" title="Permalink"></a></h2><p><code>Pkg</code> 提供了用于使用 artifacts 的 API，以及用于记录软件包中 artifacts 使用情况的 TOML 文件格式，并在软件包安装时自动下载 artifacts。Artifacts 始终可以通过内容哈希来引用，但通常通过绑定到项目源树中 <code>Artifacts.toml</code> 文件的内容哈希的名称来访问。</p><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>可以使用替代名称 <code>JuliaArtifacts.toml</code>，类似于分别使用 <code>JuliaProject.toml</code> 和 <code>JuliaManifest.toml</code> 代替 <code>Project.toml</code> 和 <code>Manifest.toml</code>。 It is possible to use the alternate name <code>JuliaArtifacts.toml</code>, similar to how it is possible to use <code>JuliaProject.toml</code> and <code>JuliaManifest.toml</code> instead of <code>Project.toml</code> and <code>Manifest.toml</code>, respectively.</p></div></div><p>此处显示了一个 <code>Artifacts.toml</code> 文件示例：</p><pre><code class="language-TOML hljs"># Example Artifacts.toml file
+[socrates]
+git-tree-sha1 = &quot;43563e7631a7eafae1f9f8d9d332e3de44ad7239&quot;
+lazy = true
+
+    [[socrates.download]]
+    url = &quot;https://github.com/staticfloat/small_bin/raw/master/socrates.tar.gz&quot;
+    sha256 = &quot;e65d2f13f2085f2c279830e863292312a72930fee5ba3c792b14c33ce5c5cc58&quot;
+
+    [[socrates.download]]
+    url = &quot;https://github.com/staticfloat/small_bin/raw/master/socrates.tar.bz2&quot;
+    sha256 = &quot;13fc17b97be41763b02cbb80e9d048302cec3bd3d446c2ed6e8210bddcd3ac76&quot;
+
+[[c_simple]]
+arch = &quot;x86_64&quot;
+git-tree-sha1 = &quot;4bdf4556050cb55b67b211d4e78009aaec378cbc&quot;
+libc = &quot;musl&quot;
+os = &quot;linux&quot;
+
+    [[c_simple.download]]
+    sha256 = &quot;411d6befd49942826ea1e59041bddf7dbb72fb871bb03165bf4e164b13ab5130&quot;
+    url = &quot;https://github.com/JuliaBinaryWrappers/c_simple_jll.jl/releases/download/c_simple+v1.2.3+0/c_simple.v1.2.3.x86_64-linux-musl.tar.gz&quot;
+
+[[c_simple]]
+arch = &quot;x86_64&quot;
+git-tree-sha1 = &quot;51264dbc770cd38aeb15f93536c29dc38c727e4c&quot;
+os = &quot;macos&quot;
+
+    [[c_simple.download]]
+    sha256 = &quot;6c17d9e1dc95ba86ec7462637824afe7a25b8509cc51453f0eb86eda03ed4dc3&quot;
+    url = &quot;https://github.com/JuliaBinaryWrappers/c_simple_jll.jl/releases/download/c_simple+v1.2.3+0/c_simple.v1.2.3.x86_64-apple-darwin14.tar.gz&quot;
+
+[processed_output]
+git-tree-sha1 = &quot;1c223e66f1a8e0fae1f9fcb9d3f2e3ce48a82200&quot;</code></pre><p>此 <code>Artifacts.toml</code> 绑定了三个 artifacts：一个命名为 <code>socrates</code>，一个命名为 <code>c_simple</code>，一个命名为 <code>processed_output</code>。artifacts 唯一需要的信息是它的 <code>git-tree-sha1</code>。因为 artifacts 仅通过其内容哈希寻址，所以 <code>Artifacts.toml</code> 文件的目的是提供有关这些 artifacts 的元数据，例如绑定人类可读的名称到内容哈希，提供有关可以从何处下载 artifacts 的信息，甚至绑定单个名称到多个哈希，由特定于平台的约束（例如操作系统或 <code>libgfortran</code> 的版本）键控(keyed)。</p><h2 id="Artifact-类型和属性"><a class="docs-heading-anchor" href="#Artifact-类型和属性">Artifact 类型和属性</a><a id="Artifact-类型和属性-1"></a><a class="docs-heading-anchor-permalink" href="#Artifact-类型和属性" title="Permalink"></a></h2><p>在上面的示例中，<code>socrates</code> artifact 展示了具有多个下载位置的独立于平台的 artifact。下载和安装 <code>socrates</code> artifact 时，将按顺序尝试 URL 直到成功。该<code>socrates</code> artifact 被标记为 <code>lazy</code>，这意味着它不会在安装包含的包时自动下载，而是在包第一次尝试使用它时按需下载。</p><p><code>c_simple</code> artifact 展示了一个依赖于平台的 artifact，其中 <code>c_simple</code> 数组中的每个条目都包含键，键帮助调用包根据主机的详细信息选择适当的下载地址。请注意，每个 artifact 都包含对应下载条目的 <code>git-tree-sha1</code> 和 <code>sha256</code>。这是为了确保下载的 tar 压缩包在尝试解压缩之前是安全的，并强制所有 tar 压缩包必须扩展为同样的整体 git 树哈希。</p><p><code>processed_output</code> artifact不包含 <code>download</code> 节，因此无法被安装。像这样的 artifact 是先前运行的代码的结果，生成一个新的 artifact 并将生成的哈希绑定到该项目中的名称上。</p><h2 id="使用-Artifacts"><a class="docs-heading-anchor" href="#使用-Artifacts">使用 Artifacts</a><a id="使用-Artifacts-1"></a><a class="docs-heading-anchor-permalink" href="#使用-Artifacts" title="Permalink"></a></h2><p>可以使用从 <code>Pkg.Artifacts</code> 命名空间公开的便捷 API 来操作 artifact 。作为一个激励性的例子，让我们想象我们正在编写一个需要加载 <a href="https://archive.ics.uci.edu/ml/datasets/iris">Iris 机器学习数据集</a>的包。虽然我们可以在构建步骤中将数据集下载到包目录中，并且目前许多包都这样做，但这有一些明显的缺点：</p><ul><li><p>首先，它修改了包目录，使包安装变得具有状态了，这是我们要避免的。将来，我们希望能够以完全只读的方式安装包，而不是在安装后能够自行修改。</p></li><li><p>其次，下载的数据不会在包的不同版本之间共享。如果我们安装了三个不同版本的包以供不同项目使用，那么我们需要三个不同的数据副本，即使这些版本之间没有更改。此外，每次我们升级或降级软件包时，除非我们做了一些聪明的事情（而且可能很脆弱），否则我们必须再次下载数据。</p></li></ul><p>对于 artifacts，我们将检查 <code>iris</code> artifacts 是否已经存在于磁盘上，只有不存在时我们才会下载并安装它，之后我们可以将结果绑定到我们的 <code>Artifacts.toml</code> 文件中：</p><pre><code class="language-julia hljs">using Pkg.Artifacts
+
+# This is the path to the Artifacts.toml we will manipulate
+artifact_toml = joinpath(@__DIR__, &quot;Artifacts.toml&quot;)
+
+# Query the `Artifacts.toml` file for the hash bound to the name &quot;iris&quot;
+# (returns `nothing` if no such binding exists)
+iris_hash = artifact_hash(&quot;iris&quot;, artifact_toml)
+
+# If the name was not bound, or the hash it was bound to does not exist, create it!
+if iris_hash == nothing || !artifact_exists(iris_hash)
+    # create_artifact() returns the content-hash of the artifact directory once we&#39;re finished creating it
+    iris_hash = create_artifact() do artifact_dir
+        # We create the artifact by simply downloading a few files into the new artifact directory
+        iris_url_base = &quot;https://archive.ics.uci.edu/ml/machine-learning-databases/iris&quot;
+        download(&quot;$(iris_url_base)/iris.data&quot;, joinpath(artifact_dir, &quot;iris.csv&quot;))
+        download(&quot;$(iris_url_base)/bezdekIris.data&quot;, joinpath(artifact_dir, &quot;bezdekIris.csv&quot;))
+        download(&quot;$(iris_url_base)/iris.names&quot;, joinpath(artifact_dir, &quot;iris.names&quot;))
+    end
+
+    # Now bind that hash within our `Artifacts.toml`.  `force = true` means that if it already exists,
+    # just overwrite with the new content-hash.  Unless the source files change, we do not expect
+    # the content hash to change, so this should not cause unnecessary version control churn.
+    bind_artifact!(artifact_toml, &quot;iris&quot;, iris_hash)
+end
+
+# Get the path of the iris dataset, either newly created or previously generated.
+# this should be something like `~/.julia/artifacts/dbd04e28be047a54fbe9bf67e934be5b5e0d357a`
+iris_dataset_path = artifact_path(iris_hash)</code></pre><p>对于使用先前绑定的 artifacts 的特定用例，我们有一个速记符号 <code>artifact&quot;name&quot;</code>，它将自动搜索当前包中的 <code>Artifacts.toml</code> 文件，按名称查找给定的 artifacts，如果尚未安装，则安装它，然后返回该给定 artifacts 的路径。下面给出了这个速记符号的一个例子：</p><pre><code class="language-julia hljs">using Pkg.Artifacts
+
+# For this to work, an `Artifacts.toml` file must be in the current working directory
+# (or in the root of the current package) and must define a mapping for the &quot;iris&quot;
+# artifact.  If it does not exist on-disk, it will be downloaded.
+iris_dataset_path = artifact&quot;iris&quot;</code></pre><h2 id="Pkg.Artifacts-API"><a class="docs-heading-anchor" href="#Pkg.Artifacts-API"><code>Pkg.Artifacts</code> API</a><a id="Pkg.Artifacts-API-1"></a><a class="docs-heading-anchor-permalink" href="#Pkg.Artifacts-API" title="Permalink"></a></h2><p><code>Artifacts</code> API 分为三个级别：哈希感知函数、名称感知函数和实用函数。 The <code>Artifacts</code> API is broken up into three levels: hash-aware functions, name-aware functions and utility functions.</p><ul><li><p><strong>哈希感知</strong>函数只处理内容哈希。这些方法允许您查询 artifact 是否存在、其路径是什么、验证 artifact 是否满足其在磁盘上的内容哈希等。哈希感知函数包括：<code>artifact_exists()</code>、<code>artifact_path()</code>、<code>remove_artifact()</code>、<code>verify_artifact()</code>和 <code>archive_artifact()</code>。请注意，通常您不应该使用 <code>remove_artifact()</code>，而应该使用 <code>Pkg.gc()</code> 来清理安装的 artifact。</p></li><li><p><strong>名称感知</strong>函数处理 <code>Artifacts.toml</code> 文件中的绑定名称，因此，通常需要 <code>Artifacts.toml</code> 文件路径和 artifact 名称。名称感知函数包括：<code>artifact_meta()</code>、<code>artifact_hash()</code>、<code>bind_artifact!()</code>、<code>unbind_artifact!()</code>、<code>download_artifact()</code> 和 <code>ensure_artifact_installed()</code>。</p></li><li><p><strong>实用</strong>函数处理 artifact 生命周期的各种方面，例如 <code>create_artifact()</code>、<code>ensure_all_artifacts_installed()</code>，甚至是 <code>@artifact_str</code> 字符串宏。</p></li></ul><p>有关文档字符串和方法的完整列表，请参阅 <a href="../api/#Artifacts-Reference">Artifacts Reference</a>章节。</p><h2 id="覆盖-artifact-位置"><a class="docs-heading-anchor" href="#覆盖-artifact-位置">覆盖 artifact 位置</a><a id="覆盖-artifact-位置-1"></a><a class="docs-heading-anchor-permalink" href="#覆盖-artifact-位置" title="Permalink"></a></h2><p>有时需要能够覆盖 artifact 的位置和内容。一个常见的例子是计算环境，其中必须使用某些版本的二进制依赖项，而不管包是使用哪个版本的依赖项发布的。虽然典型的 Julia 配置会下载、解包并链接到通用库，但系统管理员可能希望禁用此功能，而使用已安装在本地计算机上的库。<code>Pkg</code> 通过在 <code>artifacts</code> depot 目录中放置一个 <code>Overrides.toml</code> 文件启用对此功能的支持（例如对于默认用户仓库是 <code>~/.julia/artifacts/Overrides.toml</code> 文件），它可以通过内容哈希，或包的 <code>UUID</code> 和绑定到 artifact 的名称覆盖 artifact 的位置。此外，目标位置可以是绝对路径，也可以是 artifact 内容哈希。这允许系统管理员创建他们自己的 artifacts，然后他们可以通过覆盖其他包来使用新 artifact。</p><pre><code class="language-TOML hljs"># Override single hash to an absolute path
+78f35e74ff113f02274ce60dab6e92b4546ef806 = &quot;/path/to/replacement&quot;
+
+# Override single hash to new artifact content-hash
+683942669b4639019be7631caa28c38f3e1924fe = &quot;d826e316b6c0d29d9ad0875af6ca63bf67ed38c3&quot;
+
+# Override package bindings by specifying the package UUID and bound artifact name
+# For demonstration purposes we assume this package is called `Foo`
+[d57dbccd-ca19-4d82-b9b8-9d660942965b]
+libfoo = &quot;/path/to/libfoo&quot;
+libbar = &quot;683942669b4639019be7631caa28c38f3e1924fe&quot;</code></pre><p>由于<code>Pkg</code> depot 的分层特性，多个 <code>Overrides.toml</code> 文件可能同时生效。这允许“内部” <code>Overrides.toml</code> 文件覆盖放在“外部” <code>Overrides.toml</code> 文件中的覆盖规则。要删除覆盖并重新启用 artifact 的默认位置逻辑，请将条目映射插入到空字符串中：</p><pre><code class="language-TOML hljs">78f35e74ff113f02274ce60dab6e92b4546ef806 = &quot;/path/to/new/replacement&quot;
+683942669b4639019be7631caa28c38f3e1924fe = &quot;&quot;
+
+[d57dbccd-ca19-4d82-b9b8-9d660942965b]
+libfoo = &quot;&quot;</code></pre><p>如果上面给出的两个 <code>Overrides.toml</code> 片段相互叠加，最终结果将映射内容哈希 <code>78f35e74ff113f02274ce60dab6e92b4546ef806</code> 到 <code>&quot;/path/to/new/replacement&quot;</code>，并映射 <code>Foo.libbar</code> 到由内容哈希标识的 artifact <code>683942669b4639019be7631caa28c38f3e1924fe</code>。请注意，虽然该哈希之前已被覆盖，但它不再被覆盖，因此 <code>Foo.libbar</code> 将直接查看 <code>~/.julia/artifacts/683942669b4639019be7631caa28c38f3e1924fe</code> 位置。</p><p>大多数受覆盖影响的方法可以通过设置它们的 <code>honor_overrides=false</code> 关键字参数来忽略覆盖。要使基于 UUID/名称 的覆盖起作用，<code>Artifacts.toml</code> 文件必须在知道加载包的 UUID 的情况下被加载。这是由 <code>artifacts&quot;&quot;</code> 字符串宏自动推导出来的，但是，如果您出于某种原因在包中手动使用 <code>Pkg.Artifacts</code> API 并且希望尊重覆盖，则必须通过关键字参数将包的 UUID 提供给 API 调用，类似于 <code>artifact_meta()</code> 和 <code>ensure_artifact_installed()</code> 使用 <code>pkg_uuid</code> 关键字参数。</p><h2 id="扩展平台选择"><a class="docs-heading-anchor" href="#扩展平台选择">扩展平台选择</a><a id="扩展平台选择-1"></a><a class="docs-heading-anchor-permalink" href="#扩展平台选择" title="Permalink"></a></h2><div class="admonition is-compat"><header class="admonition-header">Julia 1.7</header><div class="admonition-body"><p>Pkg 的扩展平台选择至少需要 Julia 1.7，并且被认为是实验性的。</p></div></div><p>Julia 1.6 中的新增功能，<code>Platform</code> 对象可以应用扩展属性，允许使用诸如 CUDA 驱动程序版本兼容性、微架构兼容性、julia 版本兼容性等扩展属性标记 artifacts！请注意，此功能被认为是实验性的，将来可能会更改。如果您作为包开发人员发现自己需要此功能，请与我们联系，以便它可以为整个生态系统的利益而发展。为了在 <code>Pkg.add()</code> 时支持 artifact 选择，<code>Pkg</code> 将运行特殊命名的文件 <code>&lt;project_root&gt;/.pkg/select_artifacts.jl</code>，传递当前平台三元组作为第一个参数。这个 artifact 选择脚本应该打印一个 <code>TOML</code> - 表示此包根据给定平台需要的 artifacts 的序列化字典，如果给定平台三元组未明确提供平台功能，则根据需要对系统进行任何检查，以自动检测平台功能。字典的格式应该与从 <code>Artifacts.select_downloadable_artifacts()</code> 返回的匹配，实际上大多数包应该简单地用一个增强的 <code>Platform</code> 对象调用此函数。artifact 选择 hook 的定义的示例，可能如下所示，分为两个文件：</p><pre><code class="language-julia hljs"># .pkg/platform_augmentation.jl
+using Libdl, Base.BinaryPlatforms
+function augment_platform!(p::Platform)
+    # If this platform object already has a `cuda` tag set, don&#39;t augment
+    if haskey(p, &quot;cuda&quot;)
+        return p
+    end
+
+    # Open libcuda explicitly, so it gets `dlclose()`&#39;ed after we&#39;re done
+    dlopen(&quot;libcuda&quot;) do lib
+        # find symbol to ask for driver version; if we can&#39;t find it, just silently continue
+        cuDriverGetVersion = dlsym(lib, &quot;cuDriverGetVersion&quot;; throw_error=false)
+        if cuDriverGetVersion !== nothing
+            # Interrogate CUDA driver for driver version:
+            driverVersion = Ref{Cint}()
+            ccall(cuDriverGetVersion, UInt32, (Ptr{Cint},), driverVersion)
+
+            # Store only the major version
+            p[&quot;cuda&quot;] = div(driverVersion, 1000)
+        end
+    end
+
+    # Return possibly-altered `Platform` object
+    return p
+end</code></pre><pre><code class="language-julia hljs">using TOML, Artifacts, Base.BinaryPlatforms
+include(&quot;./platform_augmentation.jl&quot;)
+artifacts_toml = joinpath(dirname(@__DIR__), &quot;Artifacts.toml&quot;)
+
+# Get &quot;target triplet&quot; from ARGS, if given (defaulting to the host triplet otherwise)
+target_triplet = get(ARGS, 1, Base.BinaryPlatforms.host_triplet())
+
+# Augment this platform object with any special tags we require
+platform = augment_platform!(HostPlatform(parse(Platform, target_triplet)))
+
+# Select all downloadable artifacts that match that platform
+artifacts = select_downloadable_artifacts(artifacts_toml; platform)
+
+# Output the result to `stdout` as a TOML dictionary
+TOML.print(stdout, artifacts)</code></pre><p>在此 hook 定义中，我们的 platform<em>augmentation 例程打开一个系统库(<code>libcuda</code>)，搜索 CUDA 驱动的版本符号，然后将版本号中的主版本号嵌入到我们要增强的 <code>Platform</code> 对象的 <code>cuda</code> 属性中。虽然实际尝试关闭已加载的库对于此代码而言并不重要（因为它很可能会在包操作完成后，立即被 CUDA 包再次打开），但最佳实践是使 hook 尽可能轻量级和透明，因为它们将来可能会被其他 Pkg 实用程序使用。在您自己的包中，您也应该在使用 `@artifact</em>str` 宏时使用增强的平台对象，如下所示：</p><pre><code class="language-julia hljs">include(&quot;../.pkg/platform_augmentation.jl&quot;)
+
+function __init__()
+    p = augment_platform!(HostPlatform())
+    global my_artifact_dir = @artifact_str(&quot;MyArtifact&quot;, p)
+end</code></pre><p>这可确保您的代码使用与 Pkg 尝试安装的 artifact 相同的 artifact。</p><p>Artifact 选择 hook 仅允许使用<code>Base</code>、<code>Artifacts</code>、<code>Libdl</code> 和 <code>TOML</code> 包。不允许使用任何其他标准库，也不允许使用任何包（包括他们所属的包）。</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../registries/">« <strong>7.</strong> 注册表</a><a class="docs-footer-nextpage" href="../glossary/"><strong>9.</strong> 词汇表 »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Thursday 10 November 2022 02:44">Thursday 10 November 2022</span>. Using Julia version 1.9.0-DEV.1786.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
