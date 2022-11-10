@@ -62,16 +62,16 @@ mktempdir() do tmp
         push_preview = true,
     )
     # Put back PDF into docs/build/pdf
-    mkpath(joinpath(build, "pdf"))
-    if pdf !== nothing
-        pdf = mv(pdf, joinpath(build, "pdf", basename(pdf)))
-    end
+    # mkpath(joinpath(build, "pdf"))
+    # if pdf !== nothing
+    #     pdf = mv(pdf, joinpath(build, "pdf", basename(pdf)))
+    # end
     # Deploy PDF
-    @info "Deploying PDF"
-    deploydocs(
-        repo = "github.com/ioxera/Pkg.jl",
-        target = "build/pdf",
-        branch = "gh-pages-pdf",
-        forcepush = true,
-    )
+    # @info "Deploying PDF"
+    # deploydocs(
+    #     repo = "github.com/ioxera/Pkg.jl",
+    #     target = "build/pdf",
+    #     branch = "gh-pages-pdf",
+    #     forcepush = true,
+    # )
 end
