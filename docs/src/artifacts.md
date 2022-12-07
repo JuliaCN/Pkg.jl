@@ -46,9 +46,6 @@ println("git-tree-sha1: ", Tar.tree_hash(IOBuffer(inflate_gzip(filename))))
 
 !!! note
     可以使用替代名称 `JuliaArtifacts.toml`，类似于分别使用 `JuliaProject.toml` 和 `JuliaManifest.toml` 代替 `Project.toml` 和 `Manifest.toml`。
-    It is possible to use the alternate name `JuliaArtifacts.toml`, similar
-    to how it is possible to use `JuliaProject.toml` and `JuliaManifest.toml`
-    instead of `Project.toml` and `Manifest.toml`, respectively.
 
 此处显示了一个 `Artifacts.toml` 文件示例：
 
@@ -183,7 +180,7 @@ libfoo = "/path/to/libfoo"
 libbar = "683942669b4639019be7631caa28c38f3e1924fe"
 ```
 
-由于`Pkg` depot 的分层特性，多个 `Overrides.toml` 文件可能同时生效。这允许“内部” `Overrides.toml` 文件覆盖放在“外部” `Overrides.toml` 文件中的覆盖规则。要删除覆盖并重新启用 artifact 的默认位置逻辑，请将条目映射插入到空字符串中：
+由于`Pkg` depot 的分层特性，多个 `Overrides.toml` 文件可能同时生效。这允许“内部” `Overrides.toml` 文件覆盖放在“外部” `Overrides.toml` 文件中的覆盖规则。要删除覆盖并重新启用 artifact 的默认位置逻辑，请插入一个映射到空字符串的条目：
 
 ```TOML
 78f35e74ff113f02274ce60dab6e92b4546ef806 = "/path/to/new/replacement"
